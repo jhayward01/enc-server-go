@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+
+  mongodb:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    volumes:
+      - enc-server-go-volume:/data/db
+  
+  enc-server-go-be:
+    build:
+      context: ./
+    container_name: enc-server-go-be
+    depends_on: 
+      - mongodb
+    deploy:
+      restart_policy:
+        condition: on-failure
+    entrypoint: beserver
+    hostname: enc-server-go-be
+          
+  enc-server-go-fe:
+    build:
+      context: ./
+    depends_on: 
+      - enc-server-go-be
+    deploy:
+      restart_policy:
+        condition: on-failure
+    container_name: enc-server-go-fe
+    entrypoint: feserver
+    hostname: enc-server-go-fe
+    ports:
+      - 7777:7777
+
+volumes:
+  enc-server-go-volume:
