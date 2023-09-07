@@ -27,5 +27,11 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Start containers
+    - name: Start Servers
       run: make servers
+
+    - name: Start Integration Test
+      run: make servers
+
+    - name: Stop Servers
+      run: make stop
