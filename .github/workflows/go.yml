@@ -30,8 +30,11 @@ jobs:
     - name: Start Servers
       run: make servers
 
-    - name: Start Integration Test
-      run: make client
+    - name: Start Client
+      run: make client | sed '1,3d' | cut -f3- -d' ' > /tmp/fe-be-db.result
+
+    - name: Integration Test 
+      run: diff /tmp/fe-be-db.result test/fe-be-db.result
 
     - name: Stop Servers
       run: make stop
