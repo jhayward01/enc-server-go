@@ -43,7 +43,7 @@ client: install-client
 
 # make servers             # Run BE/FE servers in docker-compose
 servers:
-	docker-compose up --build
+	docker-compose up -d --build
 
 # make server-be-cmd       # Run BE server in terminal
 server-be-cmd: install-servers
