@@ -66,6 +66,8 @@ make server-fe-cmd       # Run FE server in terminal
 
 	* [be](services/be) - Back-end service providing data storage.
 
+* [test](test) - Defines integration tests.
+
 * [utils](utils) - Defines shared utilities, including configuration readers, logging, database clients, and network IO
 
 ## Further Work ##
@@ -76,8 +78,8 @@ make server-fe-cmd       # Run FE server in terminal
 
 * ~~Add logging.~~
 
-* Implement CI/CD pipeline.
-
-* Implement HTTP/GRPC service communication.
+* ~~Implement CI/CD pipeline.~~
 
 * Create Kubernetes configuration.
+
+* Implement alternate HTTP/GRPC service communication.
