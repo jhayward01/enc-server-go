@@ -27,7 +27,7 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Start Servers
+    - name: Start Servers 
       run: make servers
 
     - name: Integration Test 

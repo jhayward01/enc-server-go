@@ -47,8 +47,7 @@ servers:
 	
 # make itest               # Run integration tests
 itest: install-client
-	feclient | cut -f3- -d' ' | grep -v ^key > /tmp/fe-be-db.result; \
-	diff /tmp/fe-be-db.result test/fe-be-db.test
+	./test/itests.sh
 	
 # make stop                # Stop BE/FE servers in docker-compose
 stop:
