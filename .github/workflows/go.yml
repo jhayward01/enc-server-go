@@ -31,7 +31,7 @@ jobs:
       run: make servers
 
     - name: Start Integration Test
-      run: make servers
+      run: make client
 
     - name: Stop Servers
       run: make stop
