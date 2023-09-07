@@ -34,7 +34,7 @@ jobs:
       run: make client | sed '1,3d' | cut -f3- -d' ' > /tmp/fe-be-db.result
 
     - name: Integration Test 
-      run: diff /tmp/fe-be-db.result test/fe-be-db.result
+      run: diff /tmp/fe-be-db.result test/fe-be-db.test
 
     - name: Stop Servers
       run: make stop
