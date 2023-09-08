@@ -50,6 +50,8 @@ make install-servers     # Install BE/FE servers
 make all                 # Install all binaries
 make client              # Run FE client
 make servers             # Run BE/FE servers in docker-compose
+make itest               # Run integration tests
+make stop                # Stop BE/FE servers in docker-compose
 make server-be-cmd       # Run BE server in terminal
 make server-fe-cmd       # Run FE server in terminal
 ```
