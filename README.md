@@ -18,7 +18,7 @@ The _back-end_ service defines three related endpoints for storing and retrievin
     ```
     make servers
     ```
-2. In a seperate terminal, run the _front-end_ client with trial data.
+2. Run the _front-end_ client with trial data.
     ```
     make client
     ```
@@ -26,12 +26,12 @@ The _back-end_ service defines three related endpoints for storing and retrievin
 ## Running Microservices on Command Line ##
 1. Start a local MongoDB instance with default port 27017 exposed.
 
-2. Start the microservices in two seperate terminals.
+2. Start the microservices in seperate terminals.
     ```
     make server-be-cmd
     make server-fe-cmd
     ```
-2. In a third terminal, run the _front-end_ client with trial data.
+2. In third terminal, run the _front-end_ client with trial data.
     ```
     make client
     ```
