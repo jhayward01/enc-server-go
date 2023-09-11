@@ -47,7 +47,7 @@ servers:
 	
 # make itest               # Run integration tests
 itest: install-client
-	./test/itests.sh
+	./itest/itests.sh
 	
 # make stop                # Stop BE/FE servers in docker-compose
 stop:

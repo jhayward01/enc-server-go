@@ -119,10 +119,11 @@ func (s *serverImpl) deleteRecord(id []byte) (err error) {
 
 func (s *serverImpl) Respond(message string) (response []byte) {
 
+	message = strings.TrimRight(message, " \n")
 	log.Println(message)
 
 	// Split message.
-	fields := strings.Split(strings.TrimRight(message, " \n"), " ")
+	fields := strings.Split(message, " ")
 
 	// Compose response.
 	switch fields[0] {

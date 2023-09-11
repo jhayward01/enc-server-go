@@ -17,14 +17,26 @@ spec:
       - name: mongodb
         image: mongodb/mongodb-community-server:6.0-ubi8
         imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 27017
       - name: enc-server-go-be
         image: enc-server-go-enc-server-go-be:latest
         imagePullPolicy: Never
+        env:
+        - name: ENC_SERVER_GO_CONFIG_PATH
+          value: "config/config.cmd.yaml"
         command: ["beserver"]
+        ports:
+        - containerPort: 8888
       - name: enc-server-go-fe
         image: enc-server-go-enc-server-go-fe:latest
         imagePullPolicy: Never
+        env:
+        - name: ENC_SERVER_GO_CONFIG_PATH
+          value: "config/config.cmd.yaml"
         command: ["feserver"]
+        ports:
+        - containerPort: 7777
         
 ---
 apiVersion: v1
@@ -37,6 +49,5 @@ spec:
   selector:
     app: enc-server-go
   ports:
-  - nodePort: 30001
-    port: 80
+  - port: 7777
     targetPort: 7777
