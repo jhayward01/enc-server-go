@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enc-server-go
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enc-server-go
+  template:
+    metadata:
+      labels:
+        app: enc-server-go
+    spec:
+      containers:
+      - name: mongodb
+        image: mongodb/mongodb-community-server:6.0-ubi8
+        imagePullPolicy: IfNotPresent
+      - name: enc-server-go-be
+        image: enc-server-go-enc-server-go-be:latest
+        imagePullPolicy: Never
+        command: ["beserver"]
+      - name: enc-server-go-fe
+        image: enc-server-go-enc-server-go-fe:latest
+        imagePullPolicy: Never
+        command: ["feserver"]
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: enc-server-go-entrypoint
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: enc-server-go
+  ports:
+  - nodePort: 30001
+    port: 80
+    targetPort: 7777
