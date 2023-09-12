@@ -62,13 +62,13 @@ make server-fe-cmd       # Run FE server in terminal
     * _Components will log to directory `/tmp/enc-server-go-logs` by default - this path may be overriden with environment variable `ENC_SERVER_GO_LOG_DIR`._
     * _Components will also log to standard output by default - this may be overriden by setting environment variable `ENC_SERVER_GO_LOG_STDOUT` to false._
 
+* [itest](itest) - Defines integration tests.
+
 * [services](services) - Defines interfaces, clients, servers, and main packages for all microservices.
 
 	* [fe](services/fe) - Front-end service providing data encryption.
 
 	* [be](services/be) - Back-end service providing data storage.
-
-* [test](test) - Defines integration tests.
 
 * [utils](utils) - Defines shared utilities, including configuration readers, logging, database clients, and network IO
 
