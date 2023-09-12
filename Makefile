@@ -50,8 +50,8 @@ servers:
 	docker-compose up -d --build
 	
 # make itests              # Run integration tests
-itests: install-client
-	./itest/tests.sh
+itests: install-client-fe
+	./tests/tests.sh
 	
 # make stop                # Stop BE/FE servers in docker-compose
 stop:
