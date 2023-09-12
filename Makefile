@@ -12,24 +12,20 @@ fmt:
 build:
 	go build -v ./...
 	
-# make test                # Test repo
-test:
+# make tests               # Test repo
+tests:
 	go test -v ./...
 
 # make build-all           # Format, build, and test repo
 build-all: fmt build test
 	
-# make install-client      # Install FE client
-install-client:
-	go install -v services/fe/client/feclient.go 
+# make install-client-fe   # Install FE client
+install-client-fe:
+	go install -v cmd/feclient.go 
 	
 # make install-server-be   # Install BE server
 install-server-be:
-	go install -v services/be/server/beserver.go 
-
-# make install-server-fe   # Install FE server
-install-server-fe:
-	go install -v services/fe/server/feserver.go 
+	go install -v cmd/beserver.go 
 
 # make install-servers     # Install BE/FE servers
 install-servers: install-server-be install-server-fe
@@ -38,15 +34,15 @@ install-servers: install-server-be install-server-fe
 all: install-client install-servers
 
 # make client              # Run FE client
-client: install-client
+client: install-client-fe
 	feclient
 
 # make servers             # Run BE/FE servers in docker-compose
 servers:
 	docker-compose up -d --build
 	
-# make itest               # Run integration tests
-itest: install-client
+# make itests              # Run integration tests
+itests: install-client
 	./itest/itests.sh
 	
 # make stop                # Stop BE/FE servers in docker-compose

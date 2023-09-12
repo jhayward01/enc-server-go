@@ -6,7 +6,7 @@ FROM golang:1.20
 WORKDIR /app
 
 # Copy repo
-COPY ./ ./
+COPY ../.. ./
 
 # Build
 RUN make install-servers

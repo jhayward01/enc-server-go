@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"enc-server-go/utils"
+	"enc-server-go/pkg/utils"
 )
 
 type Server interface {

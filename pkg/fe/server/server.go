@@ -8,8 +8,8 @@ import (
 	"log"
 	"strings"
 
-	"enc-server-go/services/be/client/src"
-	"enc-server-go/utils"
+	"enc-server-go/pkg/be/client"
+	"enc-server-go/pkg/utils"
 )
 
 type Server interface {

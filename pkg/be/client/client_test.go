@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"enc-server-go/utils"
+	"enc-server-go/pkg/utils"
 
 	"github.com/stretchr/testify/assert"
 )

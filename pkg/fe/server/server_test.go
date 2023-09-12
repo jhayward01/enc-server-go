@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/maps"
 
-	"enc-server-go/services/be/client/src"
-	"enc-server-go/utils"
+	"enc-server-go/pkg/be/client"
+	"enc-server-go/pkg/utils"
 )
 
 // Test Constants

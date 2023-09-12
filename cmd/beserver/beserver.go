@@ -4,8 +4,8 @@ package main
 import (
 	"log"
 
-	"enc-server-go/services/be/server/src"
-	"enc-server-go/utils"
+	"enc-server-go/pkg/be/server"
+	"enc-server-go/pkg/utils"
 )
 
 const configPath = "config/config.yaml"

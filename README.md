@@ -66,16 +66,15 @@ The _back-end_ service defines three related endpoints for storing and retrievin
 make help                # Print makefile reference
 make fmt                 # Run format and static analysis tools
 make build               # Build repo
-make test                # Test repo
+make tests               # Test repo
 make build-all           # Format, build, and test repo
-make install-client      # Install FE client
+make install-client-fe   # Install FE client
 make install-server-be   # Install BE server
-make install-server-fe   # Install FE server
 make install-servers     # Install BE/FE servers
 make all                 # Install all binaries
 make client              # Run FE client
 make servers             # Run BE/FE servers in docker-compose
-make itest               # Run integration tests
+make itests              # Run integration tests
 make stop                # Stop BE/FE servers in docker-compose
 make server-be-cmd       # Run BE server in terminal
 make server-fe-cmd       # Run FE server in terminal

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"strings"
 
-	"enc-server-go/utils"
+	"enc-server-go/pkg/utils"
 )
 
 type Client interface {

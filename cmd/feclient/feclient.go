@@ -5,8 +5,8 @@ import (
 	"log"
 	"strconv"
 
-	"enc-server-go/services/fe/client/src"
-	"enc-server-go/utils"
+	"enc-server-go/pkg/fe/client"
+	"enc-server-go/pkg/utils"
 )
 
 const configPath = "config/config.yaml"
