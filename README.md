@@ -108,7 +108,7 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 		
 		* [server](pkg/be/server)
 	
-	* [utils](utils) - Defines shared utilities, including configuration readers, logging, database clients, and network IO
+	* [utils](utils) - Defines shared utilities, including configuration readers, logging, database clients, and network IO.
 
 * [test](test) - Defines integration tests.
 
