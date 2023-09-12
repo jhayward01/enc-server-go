@@ -18,6 +18,7 @@ The _back-end_ service defines three related endpoints for storing and retrievin
     ```
     make servers
     ```
+    
 2. Run the _front-end_ client with trial data.
     ```
     make client
@@ -31,11 +32,35 @@ The _back-end_ service defines three related endpoints for storing and retrievin
     make server-be-cmd
     make server-fe-cmd
     ```
+    
 2. In third terminal, run the _front-end_ client with trial data.
     ```
     make client
     ```
     
+## Running Microservices in Kubernetes ##
+1. Start local Kubernetes cluster.
+    ```
+    make start-cluster
+    ```
+    
+2. Verify cluster pods are available, and set up port-forwarding.
+    ```
+    LOCAL_HOST_PORT=7777; REMOTE_PORT=7777
+    KC_POD_NAME=$(minikube kubectl -- get pods | grep enc-server-go-fe | cut -f1 -d' ')
+    minikube kubectl -- port-forward $KC_POD_NAME $LOCAL_HOST_PORT:$REMOTE_PORT &
+    ```
+    
+3. Run the _front-end_ client with trial data.
+    ```
+    make client
+    ```
+    
+4. Stop local Kubernetes cluster.
+    ```
+    stop-cluster
+    ```
+
 ## Makefile Commands ##
 ```
 make help                # Print makefile reference
@@ -54,6 +79,8 @@ make itest               # Run integration tests
 make stop                # Stop BE/FE servers in docker-compose
 make server-be-cmd       # Run BE server in terminal
 make server-fe-cmd       # Run FE server in terminal
+make start_cluster       # Start application in local Kubernetes cluster
+make stop_cluster        # Stop application in local Kubernetes cluster
 ```
  
 ## Repo Contents ##

@@ -60,3 +60,11 @@ server-be-cmd: install-servers
 # make server-fe-cmd       # Run FE server in terminal
 server-fe-cmd: install-servers
 	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' feserver
+
+# make start_cluster       # Start application in local Kubernetes cluster
+start-cluster: 
+	./k8s/start_cluster.sh
+
+# make stop_cluster        # Stop application in local Kubernetes cluster
+stop-cluster: 
+	./k8s/stop_cluster.sh
