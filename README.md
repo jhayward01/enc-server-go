@@ -69,6 +69,8 @@ make build               # Build repo
 make tests               # Test repo
 make build-all           # Format, build, and test repo
 make install-client-fe   # Install FE client
+make install-client-be   # Install BE client
+make install-server-fe   # Install FE server
 make install-server-be   # Install BE server
 make install-servers     # Install BE/FE servers
 make all                 # Install all binaries
@@ -78,8 +80,8 @@ make itests              # Run integration tests
 make stop                # Stop BE/FE servers in docker-compose
 make server-be-cmd       # Run BE server in terminal
 make server-fe-cmd       # Run FE server in terminal
-make start_cluster       # Start application in local Kubernetes cluster
-make stop_cluster        # Stop application in local Kubernetes cluster
+make start-cluster       # Start application in local Kubernetes cluster
+make stop-cluster        # Stop application in local Kubernetes cluster
 ```
  
 ## Repo Contents ##
@@ -88,17 +90,29 @@ make stop_cluster        # Stop application in local Kubernetes cluster
     * _Components will log to directory `/tmp/enc-server-go-logs` by default - this path may be overriden with environment variable `ENC_SERVER_GO_LOG_DIR`._
     * _Components will also log to standard output by default - this may be overriden by setting environment variable `ENC_SERVER_GO_LOG_STDOUT` to false._
 
-* [itest](itest) - Defines integration tests.
+* [cmd](cmd) - Defines main applications for all services.
 
-* [k8s](k8s) - Defines optional Kubernetes scripts and configurations.
+* [config](config) - Defines default (docker-compose), command-line, and Kubernetes configurations.
 
-* [services](services) - Defines interfaces, clients, servers, and main packages for all microservices.
+* [deployments](deployments) - Defines optional Kubernetes scripts and configurations.
 
-	* [fe](services/fe) - Front-end service providing data encryption.
+* [pkg](pkg) - Defines interfaces, clients, and servers for all microservices.
 
-	* [be](services/be) - Back-end service providing data storage.
+	* [fe](pkg/fe) - Front-end service providing data encryption.
+	
+		* [client](pkg/fe/client)
+		
+		* [server](pkg/fe/server)
 
-* [utils](utils) - Defines shared utilities, including configuration readers, logging, database clients, and network IO
+	* [be](pkg/be) - Back-end service providing data storage.
+	
+		* [client](pkg/be/client)
+		
+		* [server](pkg/be/server)
+	
+	* [utils](utils) - Defines shared utilities, including configuration readers, logging, database clients, and network IO
+
+* [test](test) - Defines integration tests.
 
 ## Further Work ##
 

@@ -21,11 +21,19 @@ build-all: fmt build test
 	
 # make install-client-fe   # Install FE client
 install-client-fe:
-	go install -v cmd/feclient.go 
+	go install -v cmd/feclient/feclient.go 
+
+# make install-client-be   # Install BE client
+install-client-be:
+	go install -v cmd/beclient/beclient.go 
+
+# make install-server-fe   # Install FE server
+install-server-fe:
+	go install -v cmd/feserver/feserver.go 
 	
 # make install-server-be   # Install BE server
 install-server-be:
-	go install -v cmd/beserver.go 
+	go install -v cmd/beserver/beserver.go 
 
 # make install-servers     # Install BE/FE servers
 install-servers: install-server-be install-server-fe
@@ -57,10 +65,10 @@ server-be-cmd: install-servers
 server-fe-cmd: install-servers
 	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' feserver
 
-# make start_cluster       # Start application in local Kubernetes cluster
+# make start-cluster       # Start application in local Kubernetes cluster
 start-cluster: 
-	./k8s/start_cluster.sh
+	./deployments/k8s/start_cluster.sh
 
-# make stop_cluster        # Stop application in local Kubernetes cluster
+# make stop-cluster        # Stop application in local Kubernetes cluster
 stop-cluster: 
-	./k8s/stop_cluster.sh
+	./deployments/k8s/stop_cluster.sh
