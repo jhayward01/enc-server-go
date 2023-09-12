@@ -64,6 +64,8 @@ make server-fe-cmd       # Run FE server in terminal
 
 * [itest](itest) - Defines integration tests.
 
+* [k8s](k8s) - Defines optional Kubernetes configurations.
+
 * [services](services) - Defines interfaces, clients, servers, and main packages for all microservices.
 
 	* [fe](services/fe) - Front-end service providing data encryption.
