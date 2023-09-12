@@ -46,7 +46,7 @@ The _back-end_ service defines three related endpoints for storing and retrievin
     
 2. Verify cluster pods are available, and set up port-forwarding.
     ```
-    LOCAL_HOST_PORT=7777; REMOTE_PORT=7777
+    LOCAL_HOST_PORT=7777 && REMOTE_PORT=7777
     KC_POD_NAME=$(minikube kubectl -- get pods | grep enc-server-go-fe | cut -f1 -d' ')
     minikube kubectl -- port-forward $KC_POD_NAME $LOCAL_HOST_PORT:$REMOTE_PORT &
     ```
@@ -91,7 +91,7 @@ make stop_cluster        # Stop application in local Kubernetes cluster
 
 * [itest](itest) - Defines integration tests.
 
-* [k8s](k8s) - Defines optional Kubernetes configurations.
+* [k8s](k8s) - Defines optional Kubernetes scripts and configurations.
 
 * [services](services) - Defines interfaces, clients, servers, and main packages for all microservices.
 
@@ -111,6 +111,6 @@ make stop_cluster        # Stop application in local Kubernetes cluster
 
 * ~~Implement CI/CD pipeline.~~
 
-* Create Kubernetes configuration.
+* ~~Create Kubernetes configuration.~~
 
 * Implement alternate HTTP/GRPC service communication.
