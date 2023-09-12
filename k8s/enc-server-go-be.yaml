@@ -34,5 +34,5 @@ spec:
   selector:
     app: enc-server-go-be
   ports:
-  - port: 7777
-    targetPort: 7777
+  - port: 8888
+    targetPort: 8888

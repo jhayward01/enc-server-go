@@ -30,5 +30,5 @@ spec:
   selector:
     app: enc-server-go-db
   ports:
-  - port: 7777
-    targetPort: 7777
+  - port: 27017
+    targetPort: 27017

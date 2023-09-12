@@ -1,6 +1,6 @@
 {
 	"feClientConfigs": {
-		"serverAddr": "enc-server-go-fe:7777"
+		"serverAddr": "localhost:7777"
 	},
 	
 	"feServerConfigs": {
@@ -12,11 +12,11 @@
 	
 	"beServerConfigs": {
 		"port": "8888",
-		"mongoURI": "mongodb://enc-server-go-db:27017"
+		"mongoURI": "mongodb://localhost:27017"
 	},
 	
 	"beClientConfigs": {
-		"serverAddr": "enc-server-go-be:8888"
+		"serverAddr": "localhost:8888"
 	},
 	
 	"testParams": {

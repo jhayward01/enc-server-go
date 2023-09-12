@@ -23,7 +23,6 @@ spec:
         command: ["feserver"]
         ports:
         - containerPort: 7777
-        
 ---
 apiVersion: v1
 kind: Service
