@@ -85,14 +85,12 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 ```
  
 ## Repo Contents ##
+* [cmd](cmd) - Defines main applications for all services.
+
 * [config](config) - Contains microservice configurations for running on _docker-compose_ and command line. 
     * _Microservice components will load configuration file `config/config.json` by default - this path may be overriden with environment variable `ENC_SERVER_GO_CONFIG_PATH`._
     * _Components will log to directory `/tmp/enc-server-go-logs` by default - this path may be overriden with environment variable `ENC_SERVER_GO_LOG_DIR`._
     * _Components will also log to standard output by default - this may be overriden by setting environment variable `ENC_SERVER_GO_LOG_STDOUT` to false._
-
-* [cmd](cmd) - Defines main applications for all services.
-
-* [config](config) - Defines default (docker-compose), command-line, and Kubernetes configurations.
 
 * [deployments](deployments) - Defines optional Kubernetes scripts and configurations.
 
