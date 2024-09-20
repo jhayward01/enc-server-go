@@ -1,7 +1,6 @@
 # enc-server-go #
-This project implements a web-based encryption application in Go.
-
-Two microservices are defined in this project - a _front-end_ and _back-end_ 
+This project implements a web-based encryption application in Go. Two 
+microservices are defined in this project - a _front-end_ and _back-end_ 
 service. Both contain client and server components.
 
 The _front-end_ service defines three endpoints:
@@ -104,10 +103,17 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 ## Repo Contents ##
 * [cmd](cmd) - Defines main applications for all services.
 
-* [config](config) - Contains microservice configurations for running on _docker-compose_ and command line. 
-    * _Microservice components will load configuration file `config/config.json` by default - this path may be overridden with environment variable `ENC_SERVER_GO_CONFIG_PATH`._
-    * _Components will log to directory `/tmp/enc-server-go-logs` by default - this path may be overridden with environment variable `ENC_SERVER_GO_LOG_DIR`._
-    * _Components will also log to standard output by default - this may be overridden by setting environment variable `ENC_SERVER_GO_LOG_STDOUT` to false._
+* [config](config) - Contains microservice configurations for running on 
+ _docker-compose_ and command line. 
+    * Microservice components will load configuration file 
+    `config/config.json` by default - this path may be overridden with 
+    environment variable `ENC_SERVER_GO_CONFIG_PATH`.
+    * Components will log to directory `/tmp/enc-server-go-logs` by default 
+    - this path may be overridden with environment variable 
+    `ENC_SERVER_GO_LOG_DIR`.
+    * Components will also log to standard output by default - this may be 
+    overridden by setting environment variable `ENC_SERVER_GO_LOG_STDOUT` 
+    to false.
 
 * [deployments](deployments) - Defines Kubernetes scripts and configurations.
 
