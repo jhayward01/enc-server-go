@@ -19,7 +19,7 @@ it to the user.
 
 * _DeleteRecord_ - This endpoint accepts requests for record deletion via a user ID. 
 	
-The _back-end_ service defines three related endpoints for storing and 
+The _back-end_ service defines three parallel endpoints for storing and 
 retrieving encrypted user data. This microservice interacts with a MongoDB 
 instance to provide persistent storage of data.
 
