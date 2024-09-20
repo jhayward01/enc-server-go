@@ -47,7 +47,7 @@ client: install-client-fe
 
 # make servers             # Run BE/FE servers in docker-compose
 servers:
-	docker-compose up -d --build
+	docker compose up -d --build
 	
 # make itests              # Run integration tests
 itests: install-client-fe
@@ -55,7 +55,7 @@ itests: install-client-fe
 	
 # make stop                # Stop BE/FE servers in docker-compose
 stop:
-	docker-compose down
+	docker compose down
 
 # make server-be-cmd       # Run BE server in terminal
 server-be-cmd: install-servers

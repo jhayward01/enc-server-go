@@ -26,6 +26,7 @@ func StartLog(name string) (logFile *os.File, err error) {
 
 	// Create log file.
 	timestamp := time.Now().UTC().Format(time.RFC3339)
+	// TODO logDir here?
 	logPath := defaultDir + "/" + name + "." + timestamp + ".log"
 	logFileFlags := os.O_CREATE | os.O_APPEND | os.O_RDWR
 	logFilePerm := fs.FileMode(0666)
