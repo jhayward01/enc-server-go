@@ -67,8 +67,8 @@ server-fe-cmd: install-servers
 
 # make start-cluster       # Start application in local Kubernetes cluster
 start-cluster: 
-	./deployments/k8s/start_cluster.sh
+	./deployments/minikube/start_cluster.sh
 
 # make stop-cluster        # Stop application in local Kubernetes cluster
 stop-cluster: 
-	./deployments/k8s/stop_cluster.sh
+	./deployments/minikube/stop_cluster.sh
