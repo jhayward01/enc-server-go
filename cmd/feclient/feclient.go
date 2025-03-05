@@ -24,7 +24,7 @@ func main() {
 	// Load configuration file.
 	configs, err := utils.LoadConfigs(configPath)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	// Set test params
@@ -34,28 +34,28 @@ func main() {
 	// Make client.
 	c, err := client.MakeClient(configs["feClientConfigs"])
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	// Store record.
 	log.Println("record", string(record))
 	key, err := c.StoreRecord(id, record)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 	log.Println("key", "len="+strconv.Itoa(len(key)), hex.EncodeToString(key))
 
 	// Retrieve record.
 	retrieved, err := c.RetrieveRecord(id, key)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 	log.Println("retrieved", string(retrieved))
 
 	// Delete record.
 	err = c.DeleteRecord(id)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 	log.Println("deleted record")
 }

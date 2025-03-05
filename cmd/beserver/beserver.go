@@ -23,17 +23,17 @@ func main() {
 	// Load configuration file.
 	configs, err := utils.LoadConfigs(configPath)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	// Make server.
 	s, err := server.MakeServer(configs["beServerConfigs"])
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	// Start server.
 	if err = s.Start(); err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 }

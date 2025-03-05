@@ -23,7 +23,7 @@ func main() {
 	// Load configuration file.
 	configs, err := utils.LoadConfigs(configPath)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	// Load test params
@@ -33,26 +33,26 @@ func main() {
 	// Make client.
 	c, err := client.MakeClient(configs["beClientConfigs"])
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	// Store record.
 	log.Println("record", string(record))
 	if err = c.StoreRecord(id, record); err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	// Retrieve record.
 	retrieved, err := c.RetrieveRecord(id)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 	log.Println("retrieved", retrieved)
 
 	// Delete record.
 	err = c.DeleteRecord(id)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatal(err.Error())
 	}
 	log.Println("deleted record")
 }

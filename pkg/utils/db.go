@@ -105,7 +105,7 @@ func (db *dbImpl) DeleteRecord(id string) (err error) {
 	}
 
 	filter := bson.D{primitive.E{Key: "id", Value: id}}
-	opts := options.Delete().SetHint(bson.D{{"_id", 1}})
+	opts := options.Delete().SetHint(bson.D{{Key: "_id", Value: 1}})
 
 	result, err := coll.DeleteMany(context.TODO(), filter, opts)
 	if err != nil {
