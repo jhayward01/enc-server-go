@@ -72,7 +72,6 @@ func MakeSocketIO(configs map[string]string, responder Responder) (s *SocketIO, 
 		return nil, err
 	}
 
-	// TODO necessary here?
 	// Verify required configurations.
 	if configs["port"] == "" {
 		err = errors.New("MakeSocketIO cannot be configured with empty port")
