@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/maps"
 
-	"enc-server-go/pkg/be/client"
+	"enc-server-go/pkg/v1-sockets/be/client"
 	"enc-server-go/pkg/utils"
 )
 

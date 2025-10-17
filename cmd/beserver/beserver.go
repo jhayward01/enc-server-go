@@ -4,7 +4,7 @@ package main
 import (
 	"log"
 
-	"enc-server-go/pkg/be/server"
+	"enc-server-go/pkg/v1-sockets/be/server"
 	"enc-server-go/pkg/utils"
 )
 

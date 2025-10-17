@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 
-	"enc-server-go/pkg/fe/client"
+	"enc-server-go/pkg/v1-sockets/fe/client"
 	"enc-server-go/pkg/utils"
 )
 
