@@ -9,18 +9,6 @@ import (
 	"enc-server-go/pkg/utils"
 )
 
-type Client interface {
-
-	// This endpoint accepts requests to store a record associated with a user ID.
-	StoreRecord(id, record []byte) (key []byte, err error)
-
-	// This endpoint accepts requests for record retrieval via a user ID and AES key.
-	RetrieveRecord(id, key []byte) (record []byte, err error)
-
-	// This endpoint accepts requests for record deletion via a user ID.
-	DeleteRecord(id []byte) (err error)
-}
-
 // Client implementation.
 type clientImpl struct {
 	conn utils.Conn
@@ -98,7 +86,7 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	return nil
 }
 
-func MakeClient(configs map[string]string) (c Client, err error) {
+func MakeClient(configs map[string]string) (c utils.ClientFE, err error) {
 
 	// Verify required configurations.
 	if ok, missing := utils.VerifyConfigs(configs, []string{"serverAddr"}); !ok {

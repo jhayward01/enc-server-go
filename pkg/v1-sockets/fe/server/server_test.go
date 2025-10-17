@@ -194,7 +194,7 @@ func TestServer_MakeServer(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    Server
+		want    utils.Server
 		wantErr error
 	}{
 		{

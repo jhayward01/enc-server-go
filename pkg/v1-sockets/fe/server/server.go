@@ -12,12 +12,6 @@ import (
 	"enc-server-go/pkg/utils"
 )
 
-type Server interface {
-
-	// Start server.
-	Start() (err error)
-}
-
 // Server implementation
 type serverImpl struct {
 	keygen utils.KeyGen
@@ -207,7 +201,7 @@ func (s *serverImpl) Start() (err error) {
 }
 
 func MakeServer(configs map[string]string,
-	beClientConfigs map[string]string) (s Server, err error) {
+	beClientConfigs map[string]string) (s utils.Server, err error) {
 
 	// Verify required configurations.
 	if ok, missing := utils.VerifyConfigs(configs,
