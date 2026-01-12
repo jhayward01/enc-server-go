@@ -2,6 +2,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"log"
 
@@ -32,11 +33,23 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Verify required configurations.
+	if ok, missing := utils.VerifyTopConfigs(configs, []string{"testParams", "beClientConfigs"}); !ok {
+		err = errors.New("feclient missing configuration " + missing)
+		log.Fatal(err)
+	}
+
 	// Load test params
 	id := []byte(configs["testParams"]["id"])
 	record := []byte(configs["testParams"]["record"])
 
 	// Make client.
+	if v2 {
+		log.Println("Running in v2 mode")
+		
+	} else {
+		log.Println("Running in v1 mode")
+	}
 	c, err := client.MakeClient(configs["beClientConfigs"])
 	if err != nil {
 		log.Fatal(err)
