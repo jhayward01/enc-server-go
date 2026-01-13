@@ -45,6 +45,11 @@ all: install-client install-servers
 client: install-client-fe
 	feclient
 
+# make client-2            # Run FE client v2
+client-2: install-client-fe
+	feclient --v2
+
+
 # make servers             # Run BE/FE servers in docker-compose
 servers:
 	docker compose up -d --build
@@ -61,9 +66,17 @@ stop:
 server-be-cmd: install-servers
 	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' beserver
 
+# make server-be-cmd-2     # Run BE server v2 in terminal
+server-be-cmd-2: install-servers
+	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' beserver --v2
+
 # make server-fe-cmd       # Run FE server in terminal
 server-fe-cmd: install-servers
 	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' feserver
+
+# make server-fe-cmd-2     # Run FE server v2 in terminal
+server-fe-cmd-2: install-servers
+	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' feserver --v2
 
 # make start-cluster       # Start application in local Kubernetes cluster
 start-cluster: 

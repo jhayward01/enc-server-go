@@ -6,8 +6,10 @@ import (
 	"log"
 	"strconv"
 
+	client1 "enc-server-go/pkg/v1-sockets/fe/client"
+	client2 "enc-server-go/pkg/v2-apis/fe/client"
+	
 	"enc-server-go/pkg/utils"
-	"enc-server-go/pkg/v1-sockets/fe/client"
 )
 
 const configPath = "config/config.yaml"
@@ -43,13 +45,14 @@ func main() {
 	record := []byte(configs["testParams"]["record"])
 
 	// Make client.
+	var c utils.ClientFE
 	if v2 {
 		log.Println("Running in v2 mode")
-
+		c, err = client2.MakeClient(configs["feClientConfigs"])
 	} else {
 		log.Println("Running in v1 mode")
+		c, err = client1.MakeClient(configs["feClientConfigs"])
 	}
-	c, err := client.MakeClient(configs["feClientConfigs"])
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}

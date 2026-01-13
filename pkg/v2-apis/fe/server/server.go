@@ -2,6 +2,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,7 @@ type Server interface {
 
 // Server implementation
 type serverImpl struct {
-	db utils.DB
+	serverAddr string
 }
 
 func (s *serverImpl) Start() (err error) {
@@ -40,7 +41,7 @@ func (s *serverImpl) Start() (err error) {
 	router := gin.Default()
 	router.GET("/messages", getMessages)
 
-	router.Run("localhost:8080")
+	router.Run(s.serverAddr)
 
 	return err
 }
@@ -48,15 +49,16 @@ func (s *serverImpl) Start() (err error) {
 func MakeServer(configs map[string]string,
 	_ map[string]string) (s Server, err error) {
 
-	// Build data store wrapper.
-	db, err := utils.MakeDB(configs)
-	if err != nil {
+	// Verify required configurations.
+	if ok, missing := utils.VerifyConfigs(configs,
+		[]string{"keySize", "idKeyStr", "idNonceStr", "port"}); !ok {
+		err = errors.New("MakeServer missing configuration " + missing)
 		return nil, err
 	}
 
 	// Build server implementation.
 	si := &serverImpl{
-		db: db,
+		serverAddr: "localhost:" + configs["port"],
 	}
 
 	return si, nil
