@@ -3,7 +3,6 @@ package client
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -14,7 +13,6 @@ import (
 type clientImpl struct {
 	serverAddr string
 }
-
 
 func (c *clientImpl) StoreRecord(id, record []byte) (key []byte, err error) {
 
@@ -40,28 +38,26 @@ func (c *clientImpl) StoreRecord(id, record []byte) (key []byte, err error) {
 	// }
 
 	// return key, nil
-	
+
 	return nil, nil
 }
 
 func (c *clientImpl) RetrieveRecord(id, key []byte) (record []byte, err error) {
 
-	// Example GET request
-    getURL := "http://" + c.serverAddr + "/messages"
-    resp, err := http.Get(getURL)
-    if err != nil {
-       	return nil, errors.New("Error making GET request: " + err.Error())
-    }
-    defer resp.Body.Close()
-    
-    body, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        return nil, errors.New("Error reading response: %v" + err.Error())
-        
-    }
-    fmt.Printf("GET Response:\n%s", string(body))
-    
-    return body, nil
+	getURL := "http://" + c.serverAddr + "/records/" + string(id) + "?key=vkAZAarLbZ6w0kmL2HJP3eU1ODCgVj4k"
+	resp, err := http.Get(getURL)
+	if err != nil {
+		return nil, errors.New("Error making GET request: " + err.Error())
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.New("Error reading response: %v" + err.Error())
+
+	}
+
+	return body, nil
 }
 
 func (c *clientImpl) DeleteRecord(id []byte) (err error) {
@@ -83,7 +79,6 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 
 	return nil
 }
-
 
 func MakeClient(configs map[string]string) (c utils.ClientFE, err error) {
 

@@ -10,19 +10,38 @@ import (
 	"enc-server-go/pkg/utils"
 )
 
-type message struct {
-	ID     string `json:"id"`
-	Record string `json:"record"`
+type record struct {
+	ID   string `json:"id"`
+	Key  string `json:"key"`
+	Data string `json:"data"`
 }
 
-var messages = []message{
-	{ID: "1", Record: "Message1"},
-	{ID: "2", Record: "Message2"},
-	{ID: "3", Record: "Message3"},
+var records = []record{
+	{ID: "JTH", Key: "vkAZAarLbZ6w0kmL2HJP3eU1ODCgVj4k", Data: "PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS"},
+	{ID: "NRM", Key: "key2", Data: "PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS"},
+	{ID: "EPB", Key: "key3", Data: "PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS"},
 }
 
-func getMessages(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, messages)
+func getMessage(c *gin.Context) {
+	id := c.Param("id")
+	keyParam := c.Query("key")
+
+	if keyParam == "" {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "key not defined"})
+		return
+	}
+
+	for _, a := range records {
+		if a.ID == id {
+			if keyParam != a.Key {
+				c.IndentedJSON(http.StatusUnauthorized, gin.H{"message": "incorrect key"})
+				return
+			}
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "record not found"})
 }
 
 type Server interface {
@@ -39,7 +58,7 @@ type serverImpl struct {
 func (s *serverImpl) Start() (err error) {
 
 	router := gin.Default()
-	router.GET("/messages", getMessages)
+	router.GET("/records/:id", getMessage)
 
 	router.Run(s.serverAddr)
 
