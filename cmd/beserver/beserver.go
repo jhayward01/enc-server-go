@@ -2,12 +2,11 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"log"
 
-	"enc-server-go/pkg/v1-sockets/be/server"
 	"enc-server-go/pkg/utils"
+	"enc-server-go/pkg/v1-sockets/be/server"
 )
 
 const configPath = "config/config.yaml"
@@ -22,7 +21,7 @@ func main() {
 	// Logging
 	logFile, err := utils.StartLog("beserver")
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to start log: %v", err)
 	}
 	defer logFile.Close()
 	log.Println("Started beserver")
@@ -30,29 +29,28 @@ func main() {
 	// Load configuration file.
 	configs, err := utils.LoadConfigs(configPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to load configs: %v", err)
 	}
 
 	// Verify required configurations.
 	if ok, missing := utils.VerifyTopConfigs(configs, []string{"beServerConfigs"}); !ok {
-		err = errors.New("feserver missing configuration " + missing)
-		log.Fatal(err)
+		log.Fatalf("Configuration missing: %s", missing)
 	}
 
 	// Make server.
 	if v2 {
 		log.Println("Running in v2 mode")
-		
+
 	} else {
 		log.Println("Running in v1 mode")
 	}
 	s, err := server.MakeServer(configs["beServerConfigs"])
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to create server: %v", err)
 	}
 
 	// Start server.
 	if err = s.Start(); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }

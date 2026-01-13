@@ -2,12 +2,11 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"log"
 
-	"enc-server-go/pkg/v1-sockets/be/client"
 	"enc-server-go/pkg/utils"
+	"enc-server-go/pkg/v1-sockets/be/client"
 )
 
 const configPath = "config/config.yaml"
@@ -22,7 +21,7 @@ func main() {
 	// Logging
 	logFile, err := utils.StartLog("beclient")
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to start log: %v", err)
 	}
 	defer logFile.Close()
 	log.Println("Started beclient")
@@ -30,13 +29,12 @@ func main() {
 	// Load configuration file.
 	configs, err := utils.LoadConfigs(configPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to load configs: %v", err)
 	}
 
 	// Verify required configurations.
 	if ok, missing := utils.VerifyTopConfigs(configs, []string{"testParams", "beClientConfigs"}); !ok {
-		err = errors.New("feclient missing configuration " + missing)
-		log.Fatal(err)
+		log.Fatalf("Configuration missing: %s", missing)
 	}
 
 	// Load test params
@@ -46,32 +44,32 @@ func main() {
 	// Make client.
 	if v2 {
 		log.Println("Running in v2 mode")
-		
+
 	} else {
 		log.Println("Running in v1 mode")
 	}
 	c, err := client.MakeClient(configs["beClientConfigs"])
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	// Store record.
 	log.Println("record", string(record))
 	if err = c.StoreRecord(id, record); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to store record: %v", err)
 	}
 
 	// Retrieve record.
 	retrieved, err := c.RetrieveRecord(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to retrieve record: %v", err)
 	}
 	log.Println("retrieved", retrieved)
 
 	// Delete record.
 	err = c.DeleteRecord(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to delete record: %v", err)
 	}
 	log.Println("deleted record")
 }

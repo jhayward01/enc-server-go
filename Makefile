@@ -6,7 +6,7 @@ help:
 fmt:
 	gofmt -s -w .
 	go vet ./...
-	staticcheck ./...
+	# staticcheck ./...	# Not yet compatible with go 1.25 
 
 # make build               # Build repo
 build:
