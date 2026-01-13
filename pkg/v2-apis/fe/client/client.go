@@ -2,6 +2,8 @@
 package client
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -9,73 +11,85 @@ import (
 	"enc-server-go/pkg/utils"
 )
 
+type record struct {
+	ID   string `json:"id"`
+	Key  string `json:"key"`
+	Data string `json:"data"`
+}
+
 // Client implementation.
 type clientImpl struct {
 	serverAddr string
 }
 
-func (c *clientImpl) StoreRecord(id, record []byte) (key []byte, err error) {
+func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 
-	// // Encode data as hex strings.
-	// idStr := hex.EncodeToString(id)
-	// recordStr := hex.EncodeToString(record)
+	newRecord := record{
+		ID:   string(id),
+		Data: string(data),
+	}
 
-	// // Write request to server.
-	// message, err := c.conn.GetResponse("STORE " + idStr + " " + recordStr + "\n")
-	// if err != nil {
-	// 	return nil, err
-	// }
+	jsonData, err := json.Marshal(newRecord)
+	if err != nil {
+		return nil, errors.New("Error marshaling JSON: %v" + err.Error())
+	}
 
-	// // Check for error.
-	// if strings.HasPrefix(message, "ERROR") {
-	// 	err = errors.New(message)
-	// 	return nil, err
-	// }
+	postURL := "http://" + c.serverAddr + "/records"
+	resp, err := http.Post(postURL, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, errors.New("Error making POST request: %v" + err.Error())
+	}
+	defer resp.Body.Close()
 
-	// // Decode response
-	// if key, err = hex.DecodeString(message); err != nil {
-	// 	return nil, err
-	// }
+	data, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.New("Error reading response: %v" + err.Error())
+	}
 
-	// return key, nil
+	var newRecordWithKey record
+	if err = json.Unmarshal(data, &newRecordWithKey); err != nil {
+		return nil, errors.New("Error unmarshalling record: %v" + err.Error())
+	}
 
-	return nil, nil
+	return []byte(newRecordWithKey.Key), nil
 }
 
-func (c *clientImpl) RetrieveRecord(id, key []byte) (record []byte, err error) {
+func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 
-	getURL := "http://" + c.serverAddr + "/records/" + string(id) + "?key=vkAZAarLbZ6w0kmL2HJP3eU1ODCgVj4k"
+	getURL := "http://" + c.serverAddr + "/records/" + string(id) + "?key=" + string(key)
 	resp, err := http.Get(getURL)
 	if err != nil {
 		return nil, errors.New("Error making GET request: " + err.Error())
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("Error reading response: %v" + err.Error())
-
 	}
 
-	return body, nil
+	return data, nil
 }
 
 func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 
-	// // Encode data as hex strings
-	// idStr := hex.EncodeToString(id)
+	deleteURL := "http://" + c.serverAddr + "/records/" + string(id)
+	req, err := http.NewRequest("DELETE", deleteURL, nil)
+	if err != nil {
+		return errors.New("Error composing DELETE request: " + err.Error())
+	}
+	
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return errors.New("Error making DELETE request: " + err.Error())
+	}
+	defer resp.Body.Close()
 
-	// // Write request to server.
-	// message, err := c.conn.GetResponse("DELETE " + idStr + "\n")
-	// if err != nil {
-	// 	return err
-	// }
-
-	// // Check for error.
-	// if strings.HasPrefix(message, "ERROR") {
-	// 	err = errors.New(message)
-	// 	return err
-	// }
+	_, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return errors.New("Error reading response: %v" + err.Error())
+	}
 
 	return nil
 }

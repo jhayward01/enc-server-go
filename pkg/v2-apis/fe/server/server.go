@@ -2,6 +2,7 @@
 package server
 
 import (
+	"fmt"
 	"errors"
 	"net/http"
 
@@ -16,13 +17,37 @@ type record struct {
 	Data string `json:"data"`
 }
 
-var records = []record{
-	{ID: "JTH", Key: "vkAZAarLbZ6w0kmL2HJP3eU1ODCgVj4k", Data: "PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS"},
-	{ID: "NRM", Key: "key2", Data: "PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS"},
-	{ID: "EPB", Key: "key3", Data: "PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS"},
+var records = []record{}
+
+type Server interface {
+
+	// Start server.
+	Start() (err error)
 }
 
-func getMessage(c *gin.Context) {
+// Server implementation
+type serverImpl struct {
+	keySize    string
+	idKeyStr   string
+	idNonceStr string
+	serverAddr string
+}
+
+func (s *serverImpl) postRecord(c *gin.Context) {
+	var newRecord record
+
+    if err := c.BindJSON(&newRecord); err != nil {
+        return
+    }
+
+	newRecord.Key = s.idKeyStr
+	
+    records = append(records, newRecord)
+    fmt.Println(records)
+    c.IndentedJSON(http.StatusCreated, newRecord)
+}
+
+func (s *serverImpl) getRecord(c *gin.Context) {
 	id := c.Param("id")
 	keyParam := c.Query("key")
 
@@ -44,21 +69,28 @@ func getMessage(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "record not found"})
 }
 
-type Server interface {
+func (s *serverImpl) deleteRecord(c *gin.Context) {
+	id := c.Param("id")
 
-	// Start server.
-	Start() (err error)
-}
-
-// Server implementation
-type serverImpl struct {
-	serverAddr string
+	for i, a := range records {
+		if a.ID == id {
+			records = append(records[:i], records[i+1:]...)
+			c.IndentedJSON(http.StatusAccepted, gin.H{"message": "record not found"})
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "record not found"})
 }
 
 func (s *serverImpl) Start() (err error) {
 
 	router := gin.Default()
-	router.GET("/records/:id", getMessage)
+	
+    router.POST("/records", s.postRecord)
+    
+	router.GET("/records/:id", s.getRecord)
+	
+	router.DELETE("/records/:id", s.deleteRecord)
 
 	router.Run(s.serverAddr)
 
@@ -77,7 +109,11 @@ func MakeServer(configs map[string]string,
 
 	// Build server implementation.
 	si := &serverImpl{
+		keySize:    configs["keySize"],
+		idKeyStr:    configs["idKeyStr"],
+		idNonceStr:    configs["idNonceStr"],
 		serverAddr: "localhost:" + configs["port"],
+		
 	}
 
 	return si, nil
