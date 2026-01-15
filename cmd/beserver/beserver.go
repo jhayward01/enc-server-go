@@ -5,8 +5,10 @@ import (
 	"flag"
 	"log"
 
+	server1 "enc-server-go/pkg/v1-sockets/be/server"
+	server2 "enc-server-go/pkg/v2-apis/be/server"
+	
 	"enc-server-go/pkg/utils"
-	"enc-server-go/pkg/v1-sockets/be/server"
 )
 
 const configPath = "config/config.yaml"
@@ -38,13 +40,15 @@ func main() {
 	}
 
 	// Make server.
+	var s utils.Server
 	if v2 {
 		log.Println("Running in v2 mode")
+		s, err = server2.MakeServer(configs["beServerConfigs"])
 
 	} else {
 		log.Println("Running in v1 mode")
+		s, err = server1.MakeServer(configs["beServerConfigs"])
 	}
-	s, err := server.MakeServer(configs["beServerConfigs"])
 	if err != nil {
 		log.Fatalf("Failed to create server: %v", err)
 	}

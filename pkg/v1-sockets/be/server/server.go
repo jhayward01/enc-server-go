@@ -1,4 +1,3 @@
-// client
 package server
 
 import (

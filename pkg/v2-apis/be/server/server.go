@@ -1,16 +1,29 @@
-package main
+package server
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net"
 
-	"enc-server-go/pkg/v2-apis/be/service"
 	"google.golang.org/grpc"
+	
+	"enc-server-go/pkg/v2-apis/be/service"
+	"enc-server-go/pkg/utils"
 )
 
 type server struct {
 	service.UnimplementedBackendServiceServer
+}
+
+type Server interface {
+	// Start server.
+	Start() (err error)
+}
+
+// Server implementation
+type serverImpl struct {
+	db       utils.DB
 }
 
 func (s *server) Store(ctx context.Context, req *service.StoreRequest) (*service.StoreResponse, error) {
@@ -37,16 +50,38 @@ func (s *server) Delete(ctx context.Context, req *service.DeleteRequest) (*servi
 	return reply, nil
 }
 
-func main() {
+func (s *serverImpl) Start() (err error) {
 	lis, err := net.Listen("tcp", ":8888")
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return errors.New("failed to listen: " + err.Error())
 	}
-	s := grpc.NewServer()
-	service.RegisterBackendServiceServer(s, &server{})
+	
+	g := grpc.NewServer()
+	service.RegisterBackendServiceServer(g, &server{})
 
 	log.Println("Server listening on :8888")
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	if err := g.Serve(lis); err != nil {
+		return errors.New("failed to serve: " + err.Error())
 	}
+	
+	return nil
+}
+
+func MakeServer(configs map[string]string) (s Server, err error) {
+
+	// // Build data store wrapper.
+	// db, err := utils.MakeDB(configs)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// // Build server implementation.
+	// si := &serverImpl{
+	// 	db: db,
+	// }
+
+	si := &serverImpl{
+	}
+	
+	return si, nil
 }
