@@ -9,15 +9,14 @@ option go_package = "./service";
 // The service definition
 service ExampleService {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloResponse) {}
+  rpc Store (StoreRequest) returns (StoreResponse) {}
 }
 
-// The request message containing the user's name
-message HelloRequest {
-  string name = 1;
+message StoreRequest {
+  string id = 1;
+  string data = 2;
 }
 
-// The response message containing the greeting
-message HelloResponse {
+message StoreResponse {
   string message = 1;
 }

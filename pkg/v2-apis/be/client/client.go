@@ -61,8 +61,8 @@ func (c *clientImpl) StoreRecord(id, record []byte) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	req := &service.HelloRequest{Name: "World"}
-	_, err = s.SayHello(ctx, req)
+	req := &service.StoreRequest{Id: "World"}
+	_, err = s.Store(ctx, req)
 	if err != nil {
 		return errors.New("Could not send message: " + err.Error())
 	}

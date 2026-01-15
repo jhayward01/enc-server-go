@@ -14,11 +14,11 @@ type server struct {
 	pb.UnimplementedExampleServiceServer
 }
 
-// SayHello implements the SayHello RPC method
-func (s *server) SayHello(ctx context.Context, req *pb.HelloRequest) (*pb.HelloResponse, error) {
-	reply := &pb.HelloResponse{
-		Message: "Hello, " + req.Name + "!",
+func (s *server) Store(ctx context.Context, req *pb.StoreRequest) (*pb.StoreResponse, error) {
+	reply := &pb.StoreResponse{
+		Message: "Hello, " + req.Id + "!",
 	}
+	log.Println("Server sent reply")
 	return reply, nil
 }
 

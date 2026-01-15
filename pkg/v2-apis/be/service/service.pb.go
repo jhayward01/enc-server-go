@@ -23,28 +23,28 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// The request message containing the user's name
-type HelloRequest struct {
+type StoreRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Data          string                 `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *HelloRequest) Reset() {
-	*x = HelloRequest{}
+func (x *StoreRequest) Reset() {
+	*x = StoreRequest{}
 	mi := &file_pkg_v2_apis_be_service_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *HelloRequest) String() string {
+func (x *StoreRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HelloRequest) ProtoMessage() {}
+func (*StoreRequest) ProtoMessage() {}
 
-func (x *HelloRequest) ProtoReflect() protoreflect.Message {
+func (x *StoreRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_pkg_v2_apis_be_service_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,40 +56,46 @@ func (x *HelloRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HelloRequest.ProtoReflect.Descriptor instead.
-func (*HelloRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use StoreRequest.ProtoReflect.Descriptor instead.
+func (*StoreRequest) Descriptor() ([]byte, []int) {
 	return file_pkg_v2_apis_be_service_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *HelloRequest) GetName() string {
+func (x *StoreRequest) GetId() string {
 	if x != nil {
-		return x.Name
+		return x.Id
 	}
 	return ""
 }
 
-// The response message containing the greeting
-type HelloResponse struct {
+func (x *StoreRequest) GetData() string {
+	if x != nil {
+		return x.Data
+	}
+	return ""
+}
+
+type StoreResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *HelloResponse) Reset() {
-	*x = HelloResponse{}
+func (x *StoreResponse) Reset() {
+	*x = StoreResponse{}
 	mi := &file_pkg_v2_apis_be_service_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *HelloResponse) String() string {
+func (x *StoreResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HelloResponse) ProtoMessage() {}
+func (*StoreResponse) ProtoMessage() {}
 
-func (x *HelloResponse) ProtoReflect() protoreflect.Message {
+func (x *StoreResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_pkg_v2_apis_be_service_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -101,12 +107,12 @@ func (x *HelloResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HelloResponse.ProtoReflect.Descriptor instead.
-func (*HelloResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use StoreResponse.ProtoReflect.Descriptor instead.
+func (*StoreResponse) Descriptor() ([]byte, []int) {
 	return file_pkg_v2_apis_be_service_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *HelloResponse) GetMessage() string {
+func (x *StoreResponse) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
@@ -117,13 +123,14 @@ var File_pkg_v2_apis_be_service_service_proto protoreflect.FileDescriptor
 
 const file_pkg_v2_apis_be_service_service_proto_rawDesc = "" +
 	"\n" +
-	"$pkg/v2-apis/be/service/service.proto\x12\aservice\"\"\n" +
-	"\fHelloRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\")\n" +
-	"\rHelloResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2M\n" +
-	"\x0eExampleService\x12;\n" +
-	"\bSayHello\x12\x15.service.HelloRequest\x1a\x16.service.HelloResponse\"\x00B\vZ\t./serviceb\x06proto3"
+	"$pkg/v2-apis/be/service/service.proto\x12\aservice\"2\n" +
+	"\fStoreRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04data\x18\x02 \x01(\tR\x04data\")\n" +
+	"\rStoreResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2J\n" +
+	"\x0eExampleService\x128\n" +
+	"\x05Store\x12\x15.service.StoreRequest\x1a\x16.service.StoreResponse\"\x00B\vZ\t./serviceb\x06proto3"
 
 var (
 	file_pkg_v2_apis_be_service_service_proto_rawDescOnce sync.Once
@@ -139,12 +146,12 @@ func file_pkg_v2_apis_be_service_service_proto_rawDescGZIP() []byte {
 
 var file_pkg_v2_apis_be_service_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_pkg_v2_apis_be_service_service_proto_goTypes = []any{
-	(*HelloRequest)(nil),  // 0: service.HelloRequest
-	(*HelloResponse)(nil), // 1: service.HelloResponse
+	(*StoreRequest)(nil),  // 0: service.StoreRequest
+	(*StoreResponse)(nil), // 1: service.StoreResponse
 }
 var file_pkg_v2_apis_be_service_service_proto_depIdxs = []int32{
-	0, // 0: service.ExampleService.SayHello:input_type -> service.HelloRequest
-	1, // 1: service.ExampleService.SayHello:output_type -> service.HelloResponse
+	0, // 0: service.ExampleService.Store:input_type -> service.StoreRequest
+	1, // 1: service.ExampleService.Store:output_type -> service.StoreResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

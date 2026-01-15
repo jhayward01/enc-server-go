@@ -21,7 +21,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ExampleService_SayHello_FullMethodName = "/service.ExampleService/SayHello"
+	ExampleService_Store_FullMethodName = "/service.ExampleService/Store"
 )
 
 // ExampleServiceClient is the client API for ExampleService service.
@@ -31,7 +31,7 @@ const (
 // The service definition
 type ExampleServiceClient interface {
 	// Sends a greeting
-	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+	Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error)
 }
 
 type exampleServiceClient struct {
@@ -42,10 +42,10 @@ func NewExampleServiceClient(cc grpc.ClientConnInterface) ExampleServiceClient {
 	return &exampleServiceClient{cc}
 }
 
-func (c *exampleServiceClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
+func (c *exampleServiceClient) Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(HelloResponse)
-	err := c.cc.Invoke(ctx, ExampleService_SayHello_FullMethodName, in, out, cOpts...)
+	out := new(StoreResponse)
+	err := c.cc.Invoke(ctx, ExampleService_Store_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *exampleServiceClient) SayHello(ctx context.Context, in *HelloRequest, o
 // The service definition
 type ExampleServiceServer interface {
 	// Sends a greeting
-	SayHello(context.Context, *HelloRequest) (*HelloResponse, error)
+	Store(context.Context, *StoreRequest) (*StoreResponse, error)
 	mustEmbedUnimplementedExampleServiceServer()
 }
 
@@ -70,8 +70,8 @@ type ExampleServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedExampleServiceServer struct{}
 
-func (UnimplementedExampleServiceServer) SayHello(context.Context, *HelloRequest) (*HelloResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method SayHello not implemented")
+func (UnimplementedExampleServiceServer) Store(context.Context, *StoreRequest) (*StoreResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Store not implemented")
 }
 func (UnimplementedExampleServiceServer) mustEmbedUnimplementedExampleServiceServer() {}
 func (UnimplementedExampleServiceServer) testEmbeddedByValue()                        {}
@@ -94,20 +94,20 @@ func RegisterExampleServiceServer(s grpc.ServiceRegistrar, srv ExampleServiceSer
 	s.RegisterService(&ExampleService_ServiceDesc, srv)
 }
 
-func _ExampleService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+func _ExampleService_Store_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StoreRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExampleServiceServer).SayHello(ctx, in)
+		return srv.(ExampleServiceServer).Store(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ExampleService_SayHello_FullMethodName,
+		FullMethod: ExampleService_Store_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExampleServiceServer).SayHello(ctx, req.(*HelloRequest))
+		return srv.(ExampleServiceServer).Store(ctx, req.(*StoreRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -120,8 +120,8 @@ var ExampleService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ExampleServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SayHello",
-			Handler:    _ExampleService_SayHello_Handler,
+			MethodName: "Store",
+			Handler:    _ExampleService_Store_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
