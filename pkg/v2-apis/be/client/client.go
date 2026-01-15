@@ -56,12 +56,12 @@ func (c *clientImpl) StoreRecord(id, record []byte) (err error) {
 	}
 	defer conn.Close()
 	
-	s := service.NewExampleServiceClient(conn)
+	s := service.NewBackendServiceClient(conn)
 	
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	req := &service.StoreRequest{Id: "World"}
+	req := &service.StoreRequest{Id: string(id), Data: string(record)}
 	_, err = s.Store(ctx, req)
 	if err != nil {
 		return errors.New("Could not send message: " + err.Error())
@@ -71,11 +71,47 @@ func (c *clientImpl) StoreRecord(id, record []byte) (err error) {
 }
 
 func (c *clientImpl) RetrieveRecord(id []byte) (record []byte, err error) {
-	return nil, nil
+	
+	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return nil, errors.New("Error connecting to backend server: " + err.Error())
+	}
+	defer conn.Close()
+	
+	s := service.NewBackendServiceClient(conn)
+	
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	
+	req := &service.RetrieveRequest{Id: string(id)}
+	resp, err := s.Retrieve(ctx, req)
+	if err != nil {
+		return nil, errors.New("Could not send message: " + err.Error())
+	}
+	
+	return []byte(resp.Data), nil
 }
 
 
 func (c *clientImpl) DeleteRecord(id []byte) (err error) {
+	
+	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return errors.New("Error connecting to backend server: " + err.Error())
+	}
+	defer conn.Close()
+	
+	s := service.NewBackendServiceClient(conn)
+	
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	
+	req := &service.DeleteRequest{Id: string(id)}
+	_, err = s.Delete(ctx, req)
+	if err != nil {
+		return errors.New("Could not send message: " + err.Error())
+	}
+	
 	return nil
 }
 

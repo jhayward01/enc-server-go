@@ -1,5 +1,3 @@
-// protoc --go_out=. --go_opt=paths=source_relative     --go-grpc_out=. --go-grpc_opt=paths=source_relative pkg/v2-apis/be/proto/service.proto 
-
 syntax = "proto3";
 
 package service;
@@ -7,9 +5,10 @@ package service;
 option go_package = "./service";
 
 // The service definition
-service ExampleService {
-  // Sends a greeting
+service BackendService {
   rpc Store (StoreRequest) returns (StoreResponse) {}
+  rpc Retrieve (RetrieveRequest) returns (RetrieveResponse) {}
+  rpc Delete (DeleteRequest) returns (DeleteResponse) {}
 }
 
 message StoreRequest {
@@ -18,5 +17,22 @@ message StoreRequest {
 }
 
 message StoreResponse {
+  string message = 1;
+}
+
+message RetrieveRequest {
+  string id = 1;
+}
+
+message RetrieveResponse {
+  string message = 1;
+  string data = 2;
+}
+
+message DeleteRequest {
+  string id = 1;
+}
+
+message DeleteResponse {
   string message = 1;
 }
