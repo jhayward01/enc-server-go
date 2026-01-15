@@ -31,24 +31,24 @@ func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 
 	jsonData, err := json.Marshal(newRecord)
 	if err != nil {
-		return nil, errors.New("Error marshaling JSON: %v" + err.Error())
+		return nil, errors.New("Error marshaling JSON: " + err.Error())
 	}
 
 	postURL := "http://" + c.serverAddr + "/records"
 	resp, err := http.Post(postURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, errors.New("Error making POST request: %v" + err.Error())
+		return nil, errors.New("Error making POST request: " + err.Error())
 	}
 	defer resp.Body.Close()
 
 	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.New("Error reading response: %v" + err.Error())
+		return nil, errors.New("Error reading response: " + err.Error())
 	}
 
 	var newRecordWithKey record
 	if err = json.Unmarshal(data, &newRecordWithKey); err != nil {
-		return nil, errors.New("Error unmarshalling record: %v" + err.Error())
+		return nil, errors.New("Error unmarshalling record: " + err.Error())
 	}
 
 	return []byte(newRecordWithKey.Key), nil
@@ -65,7 +65,7 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 
 	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.New("Error reading response: %v" + err.Error())
+		return nil, errors.New("Error reading response: " + err.Error())
 	}
 
 	return data, nil
@@ -88,7 +88,7 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 
 	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return errors.New("Error reading response: %v" + err.Error())
+		return errors.New("Error reading response: " + err.Error())
 	}
 
 	return nil

@@ -16,7 +16,7 @@
     },
     
     "beClientConfigs": {
-        "serverAddr": "enc-server-go-be:8888"
+        "serverAddr": "localhost:8888"
     },
     
     "testParams": {

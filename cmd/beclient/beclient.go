@@ -4,9 +4,11 @@ package main
 import (
 	"flag"
 	"log"
+	
+	client1 "enc-server-go/pkg/v1-sockets/be/client"
+	client2 "enc-server-go/pkg/v2-apis/be/client"
 
 	"enc-server-go/pkg/utils"
-	"enc-server-go/pkg/v1-sockets/be/client"
 )
 
 const configPath = "config/config.yaml"
@@ -42,13 +44,14 @@ func main() {
 	record := []byte(configs["testParams"]["record"])
 
 	// Make client.
+	var c utils.ClientBE
 	if v2 {
 		log.Println("Running in v2 mode")
-
+		c, err = client2.MakeClient(configs["beClientConfigs"])
 	} else {
 		log.Println("Running in v1 mode")
+		c, err = client1.MakeClient(configs["beClientConfigs"])
 	}
-	c, err := client.MakeClient(configs["beClientConfigs"])
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}

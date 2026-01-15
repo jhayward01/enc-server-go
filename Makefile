@@ -53,6 +53,14 @@ client: install-client-fe
 client-2: install-client-fe
 	feclient --v2
 
+# make be-client           # Run BE client
+be-client: install-client-be
+	beclient --v2
+
+# make be-client-2         # Run BE client v2
+be-client-2: install-client-be
+	beclient --v2
+
 # make servers             # Run BE/FE servers in docker-compose
 servers:
 	docker compose up -d --build
