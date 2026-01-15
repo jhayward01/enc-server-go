@@ -1,37 +1,5 @@
 package client
 
-// import (
-// 	"context"
-// 	"log"
-// 	"time"
-
-// 	pb "enc-server-go/pkg/v2-apis/be/service"
-// 	"google.golang.org/grpc"
-// )
-
-// func main() {
-// 	// Connect to the server
-// 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
-// 	if err != nil {
-// 		log.Fatalf("did not connect: %v", err)
-// 	}
-// 	defer conn.Close()
-
-// 	c := pb.NewExampleServiceClient(conn)
-
-// 	// Call SayHello
-// 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-// 	defer cancel()
-
-// 	req := &pb.HelloRequest{Name: "World"}
-// 	res, err := c.SayHello(ctx, req)
-// 	if err != nil {
-// 		log.Fatalf("could not greet: %v", err)
-// 	}
-
-// 	log.Printf("Greeting: %s", res.Message)
-// }
-
 import (
 	"context"
 	"errors"
@@ -57,13 +25,11 @@ func (c *clientImpl) StoreRecord(id, record []byte) (err error) {
 	defer conn.Close()
 	
 	s := service.NewBackendServiceClient(conn)
-	
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	req := &service.StoreRequest{Id: string(id), Data: string(record)}
-	_, err = s.Store(ctx, req)
-	if err != nil {
+	if _, err = s.Store(ctx, req); err != nil {
 		return errors.New("Could not send message: " + err.Error())
 	}
 
@@ -79,7 +45,6 @@ func (c *clientImpl) RetrieveRecord(id []byte) (record []byte, err error) {
 	defer conn.Close()
 	
 	s := service.NewBackendServiceClient(conn)
-	
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	
@@ -92,7 +57,6 @@ func (c *clientImpl) RetrieveRecord(id []byte) (record []byte, err error) {
 	return []byte(resp.Data), nil
 }
 
-
 func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
@@ -102,13 +66,11 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	defer conn.Close()
 	
 	s := service.NewBackendServiceClient(conn)
-	
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	
 	req := &service.DeleteRequest{Id: string(id)}
-	_, err = s.Delete(ctx, req)
-	if err != nil {
+	if _, err = s.Delete(ctx, req); err != nil {
 		return errors.New("Could not send message: " + err.Error())
 	}
 	
@@ -119,8 +81,7 @@ func MakeClient(configs map[string]string) (c utils.ClientBE, err error) {
 
 	// Verify required configurations.
 	if ok, missing := utils.VerifyConfigs(configs, []string{"serverAddr"}); !ok {
-		err = errors.New("MakeClient missing configuration " + missing)
-		return nil, err
+		return nil, errors.New("MakeClient missing configuration " + missing)
 	}
 
 	// Build client implementation.

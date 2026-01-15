@@ -19,7 +19,7 @@ type serverImpl struct {
 	idNonce  []byte
 	idCipher cipher.AEAD
 
-	beClient client.Client
+	beClient utils.ClientBE
 
 	socketIO *utils.SocketIO
 }

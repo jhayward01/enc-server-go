@@ -247,7 +247,7 @@ func TestServer_store(t *testing.T) {
 
 	type fields struct {
 		keygen   utils.KeyGen
-		beClient client.Client
+		beClient utils.ClientBE
 	}
 	type args struct {
 		id     []byte
@@ -328,7 +328,7 @@ func TestServer_retrieve(t *testing.T) {
 
 	type fields struct {
 		keygen   utils.KeyGen
-		beClient client.Client
+		beClient utils.ClientBE
 	}
 	type args struct {
 		id  []byte
@@ -400,7 +400,7 @@ func TestServer_delete(t *testing.T) {
 
 	type fields struct {
 		keygen   utils.KeyGen
-		beClient client.Client
+		beClient utils.ClientBE
 	}
 	type args struct {
 		id []byte
@@ -449,7 +449,7 @@ func TestServer_delete(t *testing.T) {
 func TestServer_Respond(t *testing.T) {
 
 	type fields struct {
-		beClient client.Client
+		beClient utils.ClientBE
 	}
 	type args struct {
 		message string

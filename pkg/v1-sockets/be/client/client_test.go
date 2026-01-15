@@ -103,7 +103,7 @@ func TestClient_MakeClient(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    Client
+		want    utils.ClientBE
 		wantErr error
 	}{
 		{
