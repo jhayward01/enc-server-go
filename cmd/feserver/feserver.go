@@ -49,7 +49,6 @@ func main() {
 		log.Println("Running in v1 mode")
 		s, err = server1.MakeServer(configs["feServerConfigs"], configs["beClientConfigs"])
 	}
-
 	if err != nil {
 		log.Fatalf("Failed to create server: %v", err)
 	}

@@ -23,28 +23,46 @@ type Server interface {
 
 // Server implementation
 type serverImpl struct {
-	db       utils.DB
 }
 
+var db utils.DB
+	
 func (s *server) Store(ctx context.Context, req *service.StoreRequest) (*service.StoreResponse, error) {
+	
+	if err := db.StoreRecord(req.Id, req.Data); err != nil {
+		return nil, err
+	}
+	
 	reply := &service.StoreResponse{
-		Message: "Hello, " + req.Id + "!",
+		Message: "Stored, " + req.Id,
 	}
 	log.Println("Server sent a store reply")
 	return reply, nil
 }
 
 func (s *server) Retrieve(ctx context.Context, req *service.RetrieveRequest) (*service.RetrieveResponse, error) {
+	
+	record, err := db.RetrieveRecord(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	
 	reply := &service.RetrieveResponse{
 		Message: "Hello, " + req.Id + "!",
+		Data: record,
 	}
 	log.Println("Server sent a retrieve reply")
 	return reply, nil
 }
 
 func (s *server) Delete(ctx context.Context, req *service.DeleteRequest) (*service.DeleteResponse, error) {
+	
+	if err := db.DeleteRecord(req.Id); err != nil {
+		return nil, err
+	}
+	
 	reply := &service.DeleteResponse{
-		Message: "Hello, " + req.Id + "!",
+		Message: "Deleted, " + req.Id,
 	}
 	log.Println("Server sent a delete reply")
 	return reply, nil
@@ -69,17 +87,13 @@ func (s *serverImpl) Start() (err error) {
 
 func MakeServer(configs map[string]string) (s Server, err error) {
 
-	// // Build data store wrapper.
-	// db, err := utils.MakeDB(configs)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// Build data store wrapper.
+	db, err = utils.MakeDB(configs)
+	if err != nil {
+		return nil, err
+	}
 
-	// // Build server implementation.
-	// si := &serverImpl{
-	// 	db: db,
-	// }
-
+	// Build server implementation.
 	si := &serverImpl{
 	}
 	
