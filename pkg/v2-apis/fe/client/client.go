@@ -78,7 +78,7 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	if err != nil {
 		return errors.New("Error composing DELETE request: " + err.Error())
 	}
-	
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

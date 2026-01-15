@@ -8,6 +8,10 @@ fmt:
 	go vet ./...
 	# staticcheck ./...	# Not yet compatible with go 1.25 
 
+# make proto				# Build GRPC protos
+proto:
+	 protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative pkg/v2-apis/be/service/service.proto
+
 # make build               # Build repo
 build:
 	go build -v ./...
@@ -17,7 +21,7 @@ tests:
 	go test -v ./...
 
 # make build-all           # Format, build, and test repo
-build-all: fmt build test
+build-all: fmt proto build test
 	
 # make install-client-fe   # Install FE client
 install-client-fe:
@@ -48,7 +52,6 @@ client: install-client-fe
 # make client-2            # Run FE client v2
 client-2: install-client-fe
 	feclient --v2
-
 
 # make servers             # Run BE/FE servers in docker-compose
 servers:

@@ -2,8 +2,8 @@
 package server
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -36,15 +36,15 @@ type serverImpl struct {
 func (s *serverImpl) postRecord(c *gin.Context) {
 	var newRecord record
 
-    if err := c.BindJSON(&newRecord); err != nil {
-        return
-    }
+	if err := c.BindJSON(&newRecord); err != nil {
+		return
+	}
 
 	newRecord.Key = s.idKeyStr
-	
-    records = append(records, newRecord)
-    fmt.Println(records)
-    c.IndentedJSON(http.StatusCreated, newRecord)
+
+	records = append(records, newRecord)
+	fmt.Println(records)
+	c.IndentedJSON(http.StatusCreated, newRecord)
 }
 
 func (s *serverImpl) getRecord(c *gin.Context) {
@@ -85,11 +85,11 @@ func (s *serverImpl) deleteRecord(c *gin.Context) {
 func (s *serverImpl) Start() (err error) {
 
 	router := gin.Default()
-	
-    router.POST("/records", s.postRecord)
-    
+
+	router.POST("/records", s.postRecord)
+
 	router.GET("/records/:id", s.getRecord)
-	
+
 	router.DELETE("/records/:id", s.deleteRecord)
 
 	router.Run(s.serverAddr)
@@ -110,10 +110,9 @@ func MakeServer(configs map[string]string,
 	// Build server implementation.
 	si := &serverImpl{
 		keySize:    configs["keySize"],
-		idKeyStr:    configs["idKeyStr"],
-		idNonceStr:    configs["idNonceStr"],
+		idKeyStr:   configs["idKeyStr"],
+		idNonceStr: configs["idNonceStr"],
 		serverAddr: "localhost:" + configs["port"],
-		
 	}
 
 	return si, nil

@@ -1,37 +1,37 @@
 package main
 
 import (
-    "context"
-    "log"
-    "net"
+	"context"
+	"log"
+	"net"
 
-    "google.golang.org/grpc"
-    pb "enc-server-go/pkg/v2-apis/be/service"
+	pb "enc-server-go/pkg/v2-apis/be/service"
+	"google.golang.org/grpc"
 )
 
 // server is used to implement example.ExampleServiceServer
 type server struct {
-    pb.UnimplementedExampleServiceServer
+	pb.UnimplementedExampleServiceServer
 }
 
 // SayHello implements the SayHello RPC method
 func (s *server) SayHello(ctx context.Context, req *pb.HelloRequest) (*pb.HelloResponse, error) {
-    reply := &pb.HelloResponse{
-        Message: "Hello, " + req.Name + "!",
-    }
-    return reply, nil
+	reply := &pb.HelloResponse{
+		Message: "Hello, " + req.Name + "!",
+	}
+	return reply, nil
 }
 
 func main() {
-    lis, err := net.Listen("tcp", ":50051")
-    if err != nil {
-        log.Fatalf("failed to listen: %v", err)
-    }
-    s := grpc.NewServer()
-    pb.RegisterExampleServiceServer(s, &server{})
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	pb.RegisterExampleServiceServer(s, &server{})
 
-    log.Println("Server listening on :50051")
-    if err := s.Serve(lis); err != nil {
-        log.Fatalf("failed to serve: %v", err)
-    }
+	log.Println("Server listening on :50051")
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
