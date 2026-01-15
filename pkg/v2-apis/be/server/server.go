@@ -12,10 +12,6 @@ import (
 	"enc-server-go/pkg/utils"
 )
 
-type server struct {
-	service.UnimplementedBackendServiceServer
-}
-
 type Server interface {
 	// Start server.
 	Start() (err error)
@@ -23,13 +19,14 @@ type Server interface {
 
 // Server implementation
 type serverImpl struct {
+	service.UnimplementedBackendServiceServer
+	db utils.DB
+	serverAddr string
 }
-
-var db utils.DB
 	
-func (s *server) Store(ctx context.Context, req *service.StoreRequest) (*service.StoreResponse, error) {
+func (s *serverImpl) Store(ctx context.Context, req *service.StoreRequest) (*service.StoreResponse, error) {
 	
-	if err := db.StoreRecord(req.Id, req.Data); err != nil {
+	if err := s.db.StoreRecord(req.Id, req.Data); err != nil {
 		return nil, err
 	}
 	
@@ -40,9 +37,9 @@ func (s *server) Store(ctx context.Context, req *service.StoreRequest) (*service
 	return reply, nil
 }
 
-func (s *server) Retrieve(ctx context.Context, req *service.RetrieveRequest) (*service.RetrieveResponse, error) {
+func (s *serverImpl) Retrieve(ctx context.Context, req *service.RetrieveRequest) (*service.RetrieveResponse, error) {
 	
-	record, err := db.RetrieveRecord(req.Id)
+	record, err := s.db.RetrieveRecord(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -55,9 +52,9 @@ func (s *server) Retrieve(ctx context.Context, req *service.RetrieveRequest) (*s
 	return reply, nil
 }
 
-func (s *server) Delete(ctx context.Context, req *service.DeleteRequest) (*service.DeleteResponse, error) {
+func (s *serverImpl) Delete(ctx context.Context, req *service.DeleteRequest) (*service.DeleteResponse, error) {
 	
-	if err := db.DeleteRecord(req.Id); err != nil {
+	if err := s.db.DeleteRecord(req.Id); err != nil {
 		return nil, err
 	}
 	
@@ -69,17 +66,17 @@ func (s *server) Delete(ctx context.Context, req *service.DeleteRequest) (*servi
 }
 
 func (s *serverImpl) Start() (err error) {
-	lis, err := net.Listen("tcp", ":8888")
+	lis, err := net.Listen("tcp", s.serverAddr)
 	if err != nil {
-		return errors.New("failed to listen: " + err.Error())
+		return errors.New("Failed to listen: " + err.Error())
 	}
 	
 	g := grpc.NewServer()
-	service.RegisterBackendServiceServer(g, &server{})
+	service.RegisterBackendServiceServer(g, s)
 
-	log.Println("Server listening on :8888")
+	log.Println("Server listening on " + s.serverAddr)
 	if err := g.Serve(lis); err != nil {
-		return errors.New("failed to serve: " + err.Error())
+		return errors.New("Failed to serve: " + err.Error())
 	}
 	
 	return nil
@@ -88,13 +85,22 @@ func (s *serverImpl) Start() (err error) {
 func MakeServer(configs map[string]string) (s Server, err error) {
 
 	// Build data store wrapper.
-	db, err = utils.MakeDB(configs)
+	db, err := utils.MakeDB(configs)
 	if err != nil {
 		return nil, err
 	}
 
+	// Verify required configurations.
+	if ok, missing := utils.VerifyConfigs(configs,
+		[]string{"port"}); !ok {
+		err = errors.New("MakeServer missing configuration " + missing)
+		return nil, err
+	}
+	
 	// Build server implementation.
 	si := &serverImpl{
+		db: db,
+		serverAddr: "localhost:" + configs["port"],
 	}
 	
 	return si, nil
