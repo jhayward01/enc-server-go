@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"time"
 
@@ -16,7 +17,11 @@ type clientImpl struct {
 	serverAddr string
 }
 
-func (c *clientImpl) StoreRecord(id, record []byte) (err error) {
+func (c *clientImpl) StoreRecord(id, data []byte) (err error) {
+
+	// Encode data as hex strings
+	idStr := hex.EncodeToString(id)
+	dataStr := hex.EncodeToString(data)
 
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -28,7 +33,7 @@ func (c *clientImpl) StoreRecord(id, record []byte) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	req := &service.StoreRequest{Id: string(id), Data: string(record)}
+	req := &service.StoreRequest{Id: idStr, Data: dataStr}
 	if _, err = s.Store(ctx, req); err != nil {
 		return errors.New("Could not send message: " + err.Error())
 	}

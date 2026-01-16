@@ -46,6 +46,11 @@ func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 		return nil, errors.New("Error reading response: " + err.Error())
 	}
 
+	if resp.StatusCode != http.StatusCreated {
+		return nil, errors.New("Bad status making POST request: " + resp.Status +
+			string(data))
+	}
+
 	var newRecordWithKey record
 	if err = json.Unmarshal(data, &newRecordWithKey); err != nil {
 		return nil, errors.New("Error unmarshalling record: " + err.Error())

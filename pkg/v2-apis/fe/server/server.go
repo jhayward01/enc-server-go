@@ -3,8 +3,8 @@ package server
 
 import (
 	"crypto/cipher"
+	"encoding/hex"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -40,14 +40,47 @@ type serverImpl struct {
 }
 
 func (s *serverImpl) postRecord(c *gin.Context) {
-	var newRecord record
 
+	// Extract record ID and data
+	var newRecord record
 	if err := c.BindJSON(&newRecord); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	id, data := []byte(newRecord.ID), []byte(newRecord.Data)
+
+	// Generate cipher entry for ID.
+	idEncrypt := s.idCipher.Seal(s.idNonce, s.idNonce, id, nil)
+
+	// Generate random AES key.
+	key, err := s.keygen.RandomKey()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	records = append(records, newRecord)
-	fmt.Println(records)
+	// Generate key, cipher, and nonce for record.
+	cipher, err := s.keygen.GetGCMCipher(key)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	// Randomly generate nonce (initialization vector).
+	nonce, err := s.keygen.RandomNonce(cipher.NonceSize())
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	// Generate cipher entry for record. Place in data store.
+	recordEncrypt := cipher.Seal(nonce, nonce, data, nil)
+	if err := s.beClient.StoreRecord(idEncrypt, recordEncrypt); err != nil {
+		c.IndentedJSON(http.StatusBadGateway, gin.H{"message": err.Error()})
+		return
+	}
+
+	newRecord.Key = hex.EncodeToString(key)
 	c.IndentedJSON(http.StatusCreated, newRecord)
 }
 
@@ -102,7 +135,7 @@ func (s *serverImpl) Start() (err error) {
 }
 
 func MakeServer(configs map[string]string,
-	_ map[string]string) (s Server, err error) {
+	beClientConfigs map[string]string) (s Server, err error) {
 
 	// Verify required configurations.
 	if ok, missing := utils.VerifyConfigs(configs,
@@ -122,7 +155,7 @@ func MakeServer(configs map[string]string,
 		return nil, err
 	}
 
-	beClient, err := client.MakeClient(configs)
+	beClient, err := client.MakeClient(beClientConfigs)
 	if err != nil {
 		return nil, err
 	}
