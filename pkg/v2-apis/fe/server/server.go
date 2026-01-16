@@ -47,14 +47,16 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 		return
 	}
 
-	log.Println("FE server received a post request for", newRecord.ID, newRecord.Data)
+	log.Println("FE server received a post request for", newRecord.ID)
 
+	// Extract ID to hex
 	id, err := hex.DecodeString(newRecord.ID)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
+	// Extract data to hex
 	data, err := hex.DecodeString(newRecord.Data)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -92,8 +94,8 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 		return
 	}
 
+	// Return new record with key
 	newRecord.Key = hex.EncodeToString(key)
-
 	c.IndentedJSON(http.StatusCreated, newRecord)
 }
 
@@ -101,17 +103,22 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 	idStr := c.Param("id")
 	keyStr := c.Query("key")
 
+	log.Println("FE server received a get request for", idStr)
+
+	// Verify paramaters
 	if keyStr == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "key not defined"})
 		return
 	}
 
+	// Extract ID to hex
 	id, err := hex.DecodeString(idStr)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
+	// Extract key to hex
 	key, err := hex.DecodeString(keyStr)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -144,15 +151,21 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 		return
 	}
 
-	newRecord := record{
+	// Return retrieved record with key
+	retrievedRecord := record{
+		ID:	  idStr,
 		Data: string(data),
+		Key:  keyStr,
 	}
-	c.IndentedJSON(http.StatusOK, newRecord)
+	c.IndentedJSON(http.StatusOK, retrievedRecord)
 }
 
 func (s *serverImpl) deleteRecord(c *gin.Context) {
 	idStr := c.Param("id")
 
+	log.Println("FE server received a delete request for", idStr)
+
+	// Extract ID to hex
 	id, err := hex.DecodeString(idStr)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -168,22 +181,24 @@ func (s *serverImpl) deleteRecord(c *gin.Context) {
 		return
 	}
 
+	// Return accepted status
 	c.IndentedJSON(http.StatusAccepted, nil)
 }
 
 func (s *serverImpl) Start() (err error) {
 
+	// Create Gin router
 	router := gin.Default()
 
+	// RESTful endpoints
 	router.POST("/records", s.postRecord)
-
 	router.GET("/records/:id", s.getRecord)
-
 	router.DELETE("/records/:id", s.deleteRecord)
 
+	// Start router
 	router.Run(s.serverAddr)
 
-	return err
+	return nil
 }
 
 func MakeServer(configs map[string]string,

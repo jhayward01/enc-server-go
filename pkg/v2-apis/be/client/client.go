@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"log"
 	"time"
 
 	"google.golang.org/grpc"
@@ -22,17 +23,22 @@ func (c *clientImpl) StoreRecord(id, data []byte) (err error) {
 	// Encode data as hex strings
 	idStr := hex.EncodeToString(id)
 	dataStr := hex.EncodeToString(data)
+	
+	log.Println("BE client received a store request for", idStr)
 
+	// GRPC connection
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return errors.New("Error connecting to backend server: " + err.Error())
 	}
 	defer conn.Close()
 
+	// Create service and context
 	s := service.NewBackendServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
+	// Process store request
 	req := &service.StoreRequest{Id: idStr, Data: dataStr}
 	if _, err = s.Store(ctx, req); err != nil {
 		return errors.New("Could not send message: " + err.Error())
@@ -42,19 +48,25 @@ func (c *clientImpl) StoreRecord(id, data []byte) (err error) {
 }
 
 func (c *clientImpl) RetrieveRecord(id []byte) (data []byte, err error) {
-
+	
+	// Encode data as hex strings
 	idStr := hex.EncodeToString(id)
+	
+	log.Println("BE client received a get request for", idStr)
 
+	// GRPC connection
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, errors.New("Error connecting to backend server: " + err.Error())
 	}
 	defer conn.Close()
 
+	// Create service and context
 	s := service.NewBackendServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
+	// Process get request
 	req := &service.RetrieveRequest{Id: idStr}
 	resp, err := s.Retrieve(ctx, req)
 	if err != nil {
@@ -71,18 +83,24 @@ func (c *clientImpl) RetrieveRecord(id []byte) (data []byte, err error) {
 
 func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 
+	// Encode data as hex strings
 	idStr := hex.EncodeToString(id)
+	
+	log.Println("BE client received a delete request for", idStr)
 
+	// GRPC connection
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return errors.New("Error connecting to backend server: " + err.Error())
 	}
 	defer conn.Close()
 
+	// Create service and context
 	s := service.NewBackendServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
+	// Process delete request
 	req := &service.DeleteRequest{Id: idStr}
 	if _, err = s.Delete(ctx, req); err != nil {
 		return errors.New("Could not send message: " + err.Error())
