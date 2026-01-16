@@ -4,7 +4,7 @@ package main
 import (
 	"flag"
 	"log"
-	
+
 	client1 "enc-server-go/pkg/v1-sockets/be/client"
 	client2 "enc-server-go/pkg/v2-apis/be/client"
 

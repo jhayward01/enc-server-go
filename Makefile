@@ -16,9 +16,12 @@ proto:
 build:
 	go build -v ./...
 	
-# make tests               # Test repo
+# make tests               # Test repo (alt.)
 tests:
 	go test -v ./...
+
+# make test                # Test repo
+test: tests
 
 # make build-all           # Format, build, and test repo
 build-all: fmt proto build test

@@ -9,7 +9,6 @@ import (
 	"enc-server-go/pkg/utils"
 )
 
-
 // Client implementation
 type clientImpl struct {
 	conn utils.Conn

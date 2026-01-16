@@ -205,7 +205,7 @@ func MakeServer(configs map[string]string,
 
 	// Verify required configurations.
 	if ok, missing := utils.VerifyConfigs(configs,
-		[]string{"keySize", "idKeyStr", "idNonceStr", "port"}); !ok {
+		[]string{"idKeyStr", "idNonceStr"}); !ok {
 		err = errors.New("MakeServer missing configuration " + missing)
 		return nil, err
 	}

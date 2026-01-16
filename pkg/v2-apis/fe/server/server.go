@@ -2,6 +2,7 @@
 package server
 
 import (
+	"crypto/cipher"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"enc-server-go/pkg/utils"
+	"enc-server-go/pkg/v2-apis/be/client"
 )
 
 type record struct {
@@ -27,9 +29,13 @@ type Server interface {
 
 // Server implementation
 type serverImpl struct {
-	keySize    string
-	idKeyStr   string
-	idNonceStr string
+	keygen utils.KeyGen
+
+	idNonce  []byte
+	idCipher cipher.AEAD
+
+	beClient utils.ClientBE
+
 	serverAddr string
 }
 
@@ -39,8 +45,6 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	if err := c.BindJSON(&newRecord); err != nil {
 		return
 	}
-
-	newRecord.Key = s.idKeyStr
 
 	records = append(records, newRecord)
 	fmt.Println(records)
@@ -107,11 +111,31 @@ func MakeServer(configs map[string]string,
 		return nil, err
 	}
 
+	// Initialize fields that require error handling.
+	keygen, err := utils.MakeKeyGen(configs)
+	if err != nil {
+		return nil, err
+	}
+
+	idCipher, err := keygen.GetGCMCipher([]byte(configs["idKeyStr"]))
+	if err != nil {
+		return nil, err
+	}
+
+	beClient, err := client.MakeClient(configs)
+	if err != nil {
+		return nil, err
+	}
+
 	// Build server implementation.
 	si := &serverImpl{
-		keySize:    configs["keySize"],
-		idKeyStr:   configs["idKeyStr"],
-		idNonceStr: configs["idNonceStr"],
+		keygen: keygen,
+
+		idNonce:  []byte(configs["idNonceStr"]),
+		idCipher: idCipher,
+
+		beClient: beClient,
+
 		serverAddr: "localhost:" + configs["port"],
 	}
 

@@ -7,9 +7,9 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	
-	"enc-server-go/pkg/v2-apis/be/service"
+
 	"enc-server-go/pkg/utils"
+	"enc-server-go/pkg/v2-apis/be/service"
 )
 
 type Server interface {
@@ -20,16 +20,16 @@ type Server interface {
 // Server implementation
 type serverImpl struct {
 	service.UnimplementedBackendServiceServer
-	db utils.DB
+	db         utils.DB
 	serverAddr string
 }
-	
+
 func (s *serverImpl) Store(ctx context.Context, req *service.StoreRequest) (*service.StoreResponse, error) {
-	
+
 	if err := s.db.StoreRecord(req.Id, req.Data); err != nil {
 		return nil, err
 	}
-	
+
 	reply := &service.StoreResponse{
 		Message: "Stored, " + req.Id,
 	}
@@ -38,26 +38,26 @@ func (s *serverImpl) Store(ctx context.Context, req *service.StoreRequest) (*ser
 }
 
 func (s *serverImpl) Retrieve(ctx context.Context, req *service.RetrieveRequest) (*service.RetrieveResponse, error) {
-	
+
 	record, err := s.db.RetrieveRecord(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	reply := &service.RetrieveResponse{
 		Message: "Hello, " + req.Id + "!",
-		Data: record,
+		Data:    record,
 	}
 	log.Println("Server sent a retrieve reply")
 	return reply, nil
 }
 
 func (s *serverImpl) Delete(ctx context.Context, req *service.DeleteRequest) (*service.DeleteResponse, error) {
-	
+
 	if err := s.db.DeleteRecord(req.Id); err != nil {
 		return nil, err
 	}
-	
+
 	reply := &service.DeleteResponse{
 		Message: "Deleted, " + req.Id,
 	}
@@ -70,7 +70,7 @@ func (s *serverImpl) Start() (err error) {
 	if err != nil {
 		return errors.New("Failed to listen: " + err.Error())
 	}
-	
+
 	g := grpc.NewServer()
 	service.RegisterBackendServiceServer(g, s)
 
@@ -78,7 +78,7 @@ func (s *serverImpl) Start() (err error) {
 	if err := g.Serve(lis); err != nil {
 		return errors.New("Failed to serve: " + err.Error())
 	}
-	
+
 	return nil
 }
 
@@ -96,12 +96,12 @@ func MakeServer(configs map[string]string) (s Server, err error) {
 		err = errors.New("MakeServer missing configuration " + missing)
 		return nil, err
 	}
-	
+
 	// Build server implementation.
 	si := &serverImpl{
-		db: db,
+		db:         db,
 		serverAddr: "localhost:" + configs["port"],
 	}
-	
+
 	return si, nil
 }

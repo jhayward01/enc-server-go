@@ -107,7 +107,7 @@ var (
 )
 
 // Error Descriptions
-const badServerMessage = "MakeServer missing configuration keySize"
+const badServerMessage = "MakeServer missing configuration idKeyStr"
 const badClientMessage = "MakeClient missing configuration serverAddr"
 const badSocketIOMessage = "MakeSocketIO cannot be configured with empty port"
 const badRandomKeyMessage = "KeyGen.RandomKey error"
