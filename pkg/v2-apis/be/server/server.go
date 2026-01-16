@@ -25,19 +25,19 @@ type serverImpl struct {
 }
 
 func (s *serverImpl) Store(ctx context.Context, req *service.StoreRequest) (*service.StoreResponse, error) {
+	log.Println("BE server received a store request for", req.Id)
 
 	if err := s.db.StoreRecord(req.Id, req.Data); err != nil {
 		return nil, err
 	}
 
-	reply := &service.StoreResponse{
-		Message: "Stored, " + req.Id,
-	}
-	log.Println("Server sent a store reply")
+	reply := &service.StoreResponse{}
 	return reply, nil
 }
 
 func (s *serverImpl) Retrieve(ctx context.Context, req *service.RetrieveRequest) (*service.RetrieveResponse, error) {
+
+	log.Println("BE server received a retrieve request for", req.Id)
 
 	record, err := s.db.RetrieveRecord(req.Id)
 	if err != nil {
@@ -45,10 +45,8 @@ func (s *serverImpl) Retrieve(ctx context.Context, req *service.RetrieveRequest)
 	}
 
 	reply := &service.RetrieveResponse{
-		Message: "Hello, " + req.Id + "!",
-		Data:    record,
+		Data: record,
 	}
-	log.Println("Server sent a retrieve reply")
 	return reply, nil
 }
 
@@ -58,9 +56,7 @@ func (s *serverImpl) Delete(ctx context.Context, req *service.DeleteRequest) (*s
 		return nil, err
 	}
 
-	reply := &service.DeleteResponse{
-		Message: "Deleted, " + req.Id,
-	}
+	reply := &service.DeleteResponse{}
 	log.Println("Server sent a delete reply")
 	return reply, nil
 }

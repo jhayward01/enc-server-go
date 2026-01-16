@@ -41,7 +41,9 @@ func (c *clientImpl) StoreRecord(id, data []byte) (err error) {
 	return nil
 }
 
-func (c *clientImpl) RetrieveRecord(id []byte) (record []byte, err error) {
+func (c *clientImpl) RetrieveRecord(id []byte) (data []byte, err error) {
+
+	idStr := hex.EncodeToString(id)
 
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -53,16 +55,23 @@ func (c *clientImpl) RetrieveRecord(id []byte) (record []byte, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	req := &service.RetrieveRequest{Id: string(id)}
+	req := &service.RetrieveRequest{Id: idStr}
 	resp, err := s.Retrieve(ctx, req)
 	if err != nil {
 		return nil, errors.New("Could not send message: " + err.Error())
 	}
 
-	return []byte(resp.Data), nil
+	// Decode record from hex.
+	if data, err = hex.DecodeString(resp.Data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func (c *clientImpl) DeleteRecord(id []byte) (err error) {
+
+	idStr := hex.EncodeToString(id)
 
 	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -74,7 +83,7 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	req := &service.DeleteRequest{Id: string(id)}
+	req := &service.DeleteRequest{Id: idStr}
 	if _, err = s.Delete(ctx, req); err != nil {
 		return errors.New("Could not send message: " + err.Error())
 	}

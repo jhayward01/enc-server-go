@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"encoding/hex"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,8 +19,6 @@ type record struct {
 	Key  string `json:"key"`
 	Data string `json:"data"`
 }
-
-var records = []record{}
 
 type Server interface {
 
@@ -47,7 +46,20 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	id, data := []byte(newRecord.ID), []byte(newRecord.Data)
+
+	log.Println("FE server received a post request for", newRecord.ID, newRecord.Data)
+
+	id, err := hex.DecodeString(newRecord.ID)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	data, err := hex.DecodeString(newRecord.Data)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
 
 	// Generate cipher entry for ID.
 	idEncrypt := s.idCipher.Seal(s.idNonce, s.idNonce, id, nil)
@@ -81,42 +93,82 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	}
 
 	newRecord.Key = hex.EncodeToString(key)
+
 	c.IndentedJSON(http.StatusCreated, newRecord)
 }
 
 func (s *serverImpl) getRecord(c *gin.Context) {
-	id := c.Param("id")
-	keyParam := c.Query("key")
+	idStr := c.Param("id")
+	keyStr := c.Query("key")
 
-	if keyParam == "" {
+	if keyStr == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "key not defined"})
 		return
 	}
 
-	for _, a := range records {
-		if a.ID == id {
-			if keyParam != a.Key {
-				c.IndentedJSON(http.StatusUnauthorized, gin.H{"message": "incorrect key"})
-				return
-			}
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
+	id, err := hex.DecodeString(idStr)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "record not found"})
+
+	key, err := hex.DecodeString(keyStr)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	// Generate fixed cipher entry for ID for lookup.
+	idEncrypt := s.idCipher.Seal(s.idNonce, s.idNonce, id, nil)
+
+	// Generate cipher for record.
+	cipher, err := s.keygen.GetGCMCipher(key)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	// Retrieve record from data store.
+	recordEncrypt, err := s.beClient.RetrieveRecord(idEncrypt)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	// Decrypt record from cipher entry.
+	var data []byte
+	nonce := recordEncrypt[:cipher.NonceSize()]
+	remainder := recordEncrypt[cipher.NonceSize():]
+	if data, err = cipher.Open(nil, nonce, remainder, nil); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	newRecord := record{
+		Data: string(data),
+	}
+	c.IndentedJSON(http.StatusOK, newRecord)
 }
 
 func (s *serverImpl) deleteRecord(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
 
-	for i, a := range records {
-		if a.ID == id {
-			records = append(records[:i], records[i+1:]...)
-			c.IndentedJSON(http.StatusAccepted, gin.H{"message": "record not found"})
-			return
-		}
+	id, err := hex.DecodeString(idStr)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "record not found"})
+
+	// Generate fixed cipher entry for ID for lookup.
+	idEncrypt := s.idCipher.Seal(s.idNonce, s.idNonce, id, nil)
+
+	// Delete record from data store.
+	if err = s.beClient.DeleteRecord(idEncrypt); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusAccepted, nil)
 }
 
 func (s *serverImpl) Start() (err error) {

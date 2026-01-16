@@ -3,9 +3,11 @@ package client
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"enc-server-go/pkg/utils"
@@ -24,9 +26,15 @@ type clientImpl struct {
 
 func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 
+	// Encode data as hex strings.
+	idStr := hex.EncodeToString(id)
+	dataStr := hex.EncodeToString(data)
+
+	log.Println("FE client received a store request for", idStr, dataStr)
+
 	newRecord := record{
-		ID:   string(id),
-		Data: string(data),
+		ID:   idStr,
+		Data: dataStr,
 	}
 
 	jsonData, err := json.Marshal(newRecord)
@@ -47,21 +55,28 @@ func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 	}
 
 	if resp.StatusCode != http.StatusCreated {
-		return nil, errors.New("Bad status making POST request: " + resp.Status +
-			string(data))
+		return nil, errors.New("Bad status making POST request: " + resp.Status + " " + string(data))
 	}
 
-	var newRecordWithKey record
-	if err = json.Unmarshal(data, &newRecordWithKey); err != nil {
+	if err = json.Unmarshal(data, &newRecord); err != nil {
 		return nil, errors.New("Error unmarshalling record: " + err.Error())
 	}
 
-	return []byte(newRecordWithKey.Key), nil
+	if key, err = hex.DecodeString(newRecord.Key); err != nil {
+		return nil, errors.New("Error decoding key: " + err.Error())
+	}
+	return key, nil
 }
 
 func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 
-	getURL := "http://" + c.serverAddr + "/records/" + string(id) + "?key=" + string(key)
+	// Encode data as hex strings.
+	idStr := hex.EncodeToString(id)
+	keyStr := hex.EncodeToString(key)
+
+	log.Println("FE client received a retrieve request for", idStr, keyStr)
+
+	getURL := "http://" + c.serverAddr + "/records/" + idStr + "?key=" + keyStr
 	resp, err := http.Get(getURL)
 	if err != nil {
 		return nil, errors.New("Error making GET request: " + err.Error())
@@ -73,12 +88,21 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 		return nil, errors.New("Error reading response: " + err.Error())
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("Bad status making GET request: " + resp.Status + " " + string(data))
+	}
+
 	return data, nil
 }
 
 func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 
-	deleteURL := "http://" + c.serverAddr + "/records/" + string(id)
+	// Encode data as hex strings.
+	idStr := hex.EncodeToString(id)
+
+	log.Println("FE client received a delete request for", idStr)
+
+	deleteURL := "http://" + c.serverAddr + "/records/" + idStr
 	req, err := http.NewRequest("DELETE", deleteURL, nil)
 	if err != nil {
 		return errors.New("Error composing DELETE request: " + err.Error())
@@ -91,9 +115,13 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	}
 	defer resp.Body.Close()
 
-	_, err = ioutil.ReadAll(resp.Body)
+	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return errors.New("Error reading response: " + err.Error())
+	}
+
+	if resp.StatusCode != http.StatusAccepted {
+		return errors.New("Bad status making DELETE request: " + resp.Status + " " + string(data))
 	}
 
 	return nil
