@@ -319,11 +319,11 @@ const file_pkg_v2_apis_be_service_service_proto_rawDesc = "" +
 	"\rDeleteRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"*\n" +
 	"\x0eDeleteResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\xca\x01\n" +
-	"\x0eBackendService\x128\n" +
-	"\x05Store\x12\x15.service.StoreRequest\x1a\x16.service.StoreResponse\"\x00\x12A\n" +
-	"\bRetrieve\x12\x18.service.RetrieveRequest\x1a\x19.service.RetrieveResponse\"\x00\x12;\n" +
-	"\x06Delete\x12\x16.service.DeleteRequest\x1a\x17.service.DeleteResponse\"\x00B\vZ\t./serviceb\x06proto3"
+	"\amessage\x18\x01 \x01(\tR\amessage2\xdc\x01\n" +
+	"\x0eBackendService\x12>\n" +
+	"\vStoreRecord\x12\x15.service.StoreRequest\x1a\x16.service.StoreResponse\"\x00\x12G\n" +
+	"\x0eRetrieveRecord\x12\x18.service.RetrieveRequest\x1a\x19.service.RetrieveResponse\"\x00\x12A\n" +
+	"\fDeleteRecord\x12\x16.service.DeleteRequest\x1a\x17.service.DeleteResponse\"\x00B\vZ\t./serviceb\x06proto3"
 
 var (
 	file_pkg_v2_apis_be_service_service_proto_rawDescOnce sync.Once
@@ -347,12 +347,12 @@ var file_pkg_v2_apis_be_service_service_proto_goTypes = []any{
 	(*DeleteResponse)(nil),   // 5: service.DeleteResponse
 }
 var file_pkg_v2_apis_be_service_service_proto_depIdxs = []int32{
-	0, // 0: service.BackendService.Store:input_type -> service.StoreRequest
-	2, // 1: service.BackendService.Retrieve:input_type -> service.RetrieveRequest
-	4, // 2: service.BackendService.Delete:input_type -> service.DeleteRequest
-	1, // 3: service.BackendService.Store:output_type -> service.StoreResponse
-	3, // 4: service.BackendService.Retrieve:output_type -> service.RetrieveResponse
-	5, // 5: service.BackendService.Delete:output_type -> service.DeleteResponse
+	0, // 0: service.BackendService.StoreRecord:input_type -> service.StoreRequest
+	2, // 1: service.BackendService.RetrieveRecord:input_type -> service.RetrieveRequest
+	4, // 2: service.BackendService.DeleteRecord:input_type -> service.DeleteRequest
+	1, // 3: service.BackendService.StoreRecord:output_type -> service.StoreResponse
+	3, // 4: service.BackendService.RetrieveRecord:output_type -> service.RetrieveResponse
+	5, // 5: service.BackendService.DeleteRecord:output_type -> service.DeleteResponse
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

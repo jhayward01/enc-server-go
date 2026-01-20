@@ -6,8 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/maps"
-	
+
 	"enc-server-go/pkg/utils"
+	"enc-server-go/pkg/v2-apis/be/service"
 )
 
 // Test Constants
@@ -35,35 +36,26 @@ var (
 	}
 
 	goodServer = &serverImpl{
-		db: goodDB,
+		db:         goodDB,
+		serverAddr: "localhost:8888",
 	}
 
-	goodSocketIO, _ = utils.MakeSocketIO(goodServerConfig, goodServer)
-
-	// Cannot set socket IO until server has been created.
-	_ = func() bool {
-		goodServer.socketIO = goodSocketIO
-		return true
+	badDBConfig = func() map[string]string {
+		m := maps.Clone(goodServerConfig)
+		delete(m, "mongoURI")
+		return m
 	}()
-
-	badDBConfig = map[string]string{
-		"foo": "bar"}
-
-	badSocketIOConfig = map[string]string{
-		"mongoURI": mongoURI,
-	}
 
 	badPortConfig = func() map[string]string {
 		m := maps.Clone(goodServerConfig)
-		m["port"] = ""
+		delete(m, "port")
 		return m
 	}()
 )
 
 // Error Descriptions
 const badDBMessage = "MakeDB missing configuration mongoURI"
-const badSocketIOMessage = "MakeSocketIO missing configuration port"
-const badPortMessage = "MakeSocketIO cannot be configured with empty port"
+const badPortMessage = "MakeServer missing configuration port"
 
 const badRequest = "Malformed request"
 const badDBClientMessage = "Database client error"
@@ -124,11 +116,6 @@ func TestServer_MakeServer(t *testing.T) {
 			wantErr: errors.New(badDBMessage),
 		},
 		{
-			name:    "should fail loading SocketIO",
-			args:    args{badSocketIOConfig},
-			wantErr: errors.New(badSocketIOMessage),
-		},
-		{
 			name:    "should fail on bad port",
 			args:    args{badPortConfig},
 			wantErr: errors.New(badPortMessage),
@@ -144,20 +131,20 @@ func TestServer_MakeServer(t *testing.T) {
 	}
 }
 
-// Respond() - Test Method
-func TestServer_Respond(t *testing.T) {
+// StoreRecord() - Test Method
+func TestServer_StoreRecord(t *testing.T) {
 
 	type fields struct {
 		db utils.DB
 	}
 	type args struct {
-		message string
+		req *service.StoreRequest
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    []byte
+		want    *service.StoreResponse
 		wantErr error
 	}{
 		{
@@ -165,84 +152,148 @@ func TestServer_Respond(t *testing.T) {
 			fields: fields{
 				db: &MockDB{t, ""},
 			},
-			args: args{"STORE " + idHexEncStr + " " + recordHexEncStr},
-			want: []byte("SUCCESS\n"),
-		},
-		{
-			name: "should run RetrieveRecord() successfully",
-			fields: fields{
-				db: &MockDB{t, ""},
+			args: args{
+				req: &service.StoreRequest{
+					Id:   idHexEncStr,
+					Data: recordHexEncStr,
+				},
 			},
-			args: args{"RETRIEVE " + idHexEncStr},
-			want: []byte(recordHexEncStr + "\n"),
-		},
-		{
-			name: "should run DeleteRecord() successfully",
-			fields: fields{
-				db: &MockDB{t, ""},
-			},
-			args: args{"RETRIEVE " + idHexEncStr},
-			want: []byte(recordHexEncStr + "\n"),
-		},
-		{
-			name: "should fail on StoreRecord() token count",
-			fields: fields{
-				db: &MockDB{t, ""},
-			},
-			args: args{"STORE"},
-			want: []byte("ERROR " + badRequest + "\n"),
-		},
-		{
+			want: &service.StoreResponse{},
+		},{
 			name: "should fail on database client StoreRecord()",
 			fields: fields{
 				db: &MockDB{t, "Store"},
 			},
-			args: args{"STORE " + idHexEncStr + " " + recordHexEncStr},
-			want: []byte("ERROR " + badDBClientMessage + "\n"),
-		},
-		{
-			name: "should fail on RetrieveRecord() token count",
-			fields: fields{
-				db: &MockDB{t, ""},
+			args: args{
+				req: &service.StoreRequest{
+					Id:   idHexEncStr,
+					Data: recordHexEncStr,
+				},
 			},
-			args: args{"STORE"},
-			want: []byte("ERROR " + badRequest + "\n"),
-		},
-		{
-			name: "should fail on database client RetrieveRecord()",
-			fields: fields{
-				db: &MockDB{t, "Retrieve"},
-			},
-			args: args{"RETRIEVE " + idHexEncStr},
-			want: []byte("ERROR " + badDBClientMessage + "\n"),
-		},
-		{
-			name: "should fail on DeleteRecord() token count",
-			fields: fields{
-				db: &MockDB{t, ""},
-			},
-			args: args{"DELETE"},
-			want: []byte("ERROR " + badRequest + "\n"),
-		},
-		{
-			name: "should fail on database client DeleteRecord()",
-			fields: fields{
-				db: &MockDB{t, "Delete"},
-			},
-			args: args{"DELETE " + idHexEncStr},
-			want: []byte("ERROR " + badDBClientMessage + "\n"),
+			wantErr: errors.New(badDBClientMessage),
 		},
 	}
 
 	for _, test := range tests {
 		s := &serverImpl{
-			db:       test.fields.db,
-			socketIO: goodSocketIO,
+			db: test.fields.db,
 		}
 
 		t.Run(test.name, func(t *testing.T) {
-			got := s.Respond(test.args.message)
+			got, err := s.StoreRecord(nil, test.args.req)
 			assert.Equal(t, test.want, got)
+			assert.Equal(t, test.wantErr, err)
+		})
+	}
+}
+
+// RetrieveRecord() - Test Method
+func TestServer_RetrieveRecord(t *testing.T) {
+
+	type fields struct {
+		db utils.DB
+	}
+	type args struct {
+		req *service.RetrieveRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *service.RetrieveResponse
+		wantErr error
+	}{
+		{
+			name: "should run RetrieveRecord() successfully",
+			fields: fields{
+				db: &MockDB{t, ""},
+			},
+			args: args{
+				req: &service.RetrieveRequest{
+					Id:   idHexEncStr,
+				},
+			},
+			want: &service.RetrieveResponse{
+				Data: recordHexEncStr,
+			},
+		},{
+			name: "should fail on database client RetrieveRecord()",
+			fields: fields{
+				db: &MockDB{t, "Retrieve"},
+			},
+			args: args{
+				req: &service.RetrieveRequest{
+					Id:   idHexEncStr,
+				},
+			},
+			wantErr: errors.New(badDBClientMessage),
+		},
+	}
+
+	for _, test := range tests {
+		s := &serverImpl{
+			db: test.fields.db,
+		}
+
+		t.Run(test.name, func(t *testing.T) {
+			got, err := s.RetrieveRecord(nil, test.args.req)
+			assert.Equal(t, test.want, got)
+			assert.Equal(t, test.wantErr, err)
+		})
+	}
+}
+
+
+// DeleteRecord() - Test Method
+func TestServer_DeleteRecord(t *testing.T) {
+
+	type fields struct {
+		db utils.DB
+	}
+	type args struct {
+		req *service.DeleteRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *service.DeleteResponse
+		wantErr error
+	}{
+		{
+			name: "should run DeleteRecord() successfully",
+			fields: fields{
+				db: &MockDB{t, ""},
+			},
+			args: args{
+				req: &service.DeleteRequest{
+					Id:   idHexEncStr,
+				},
+			},
+			want: &service.DeleteResponse{},
+		},{
+			name: "should fail on database client DeleteRecord()",
+			fields: fields{
+				db: &MockDB{t, "Delete"},
+			},
+			args: args{
+				req: &service.DeleteRequest{
+					Id:   idHexEncStr,
+				},
+			},
+			wantErr: errors.New(badDBClientMessage),
+		},
+	}
+
+	for _, test := range tests {
+		s := &serverImpl{
+			db: test.fields.db,
+		}
+
+		t.Run(test.name, func(t *testing.T) {
+			got, err := s.DeleteRecord(nil, test.args.req)
+			assert.Equal(t, test.want, got)
+			assert.Equal(t, test.wantErr, err)
 		})
 	}
 }

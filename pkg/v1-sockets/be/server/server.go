@@ -19,7 +19,7 @@ type serverImpl struct {
 	socketIO *utils.SocketIO
 }
 
-func (s *serverImpl) store(id, record string) (err error) {
+func (s *serverImpl) storeRecord(id, record string) (err error) {
 
 	// Call data store wrapper store method.
 	if err = s.db.StoreRecord(id, record); err != nil {
@@ -29,7 +29,7 @@ func (s *serverImpl) store(id, record string) (err error) {
 	return nil
 }
 
-func (s *serverImpl) retrieve(id string) (record string, err error) {
+func (s *serverImpl) retrieveRecord(id string) (record string, err error) {
 
 	// Call data store wrapper retrieve method.
 	if record, err = s.db.RetrieveRecord(id); err != nil {
@@ -39,7 +39,7 @@ func (s *serverImpl) retrieve(id string) (record string, err error) {
 	return record, nil
 }
 
-func (s *serverImpl) delete(id string) (err error) {
+func (s *serverImpl) deleteRecord(id string) (err error) {
 
 	// Call data store wrapper delete method.
 	if err = s.db.DeleteRecord(id); err != nil {
@@ -67,7 +67,7 @@ func (s *serverImpl) Respond(message string) (response []byte) {
 		}
 		id, record := fields[1], fields[2]
 
-		if err := s.store(id, record); err != nil {
+		if err := s.storeRecord(id, record); err != nil {
 			response = []byte("ERROR " + err.Error() + "\n")
 			return response
 		}
@@ -81,7 +81,7 @@ func (s *serverImpl) Respond(message string) (response []byte) {
 		}
 		id := fields[1]
 
-		record, err := s.retrieve(id)
+		record, err := s.retrieveRecord(id)
 		if err != nil {
 			response = []byte("ERROR " + err.Error() + "\n")
 			return response
@@ -96,7 +96,7 @@ func (s *serverImpl) Respond(message string) (response []byte) {
 		}
 		id := fields[1]
 
-		err := s.delete(id)
+		err := s.deleteRecord(id)
 		if err != nil {
 			response = []byte("ERROR " + err.Error() + "\n")
 			return response

@@ -24,7 +24,7 @@ type serverImpl struct {
 	serverAddr string
 }
 
-func (s *serverImpl) Store(ctx context.Context, req *service.StoreRequest) (*service.StoreResponse, error) {
+func (s *serverImpl) StoreRecord(ctx context.Context, req *service.StoreRequest) (*service.StoreResponse, error) {
 	log.Println("BE server received a store request for", req.Id)
 
 	if err := s.db.StoreRecord(req.Id, req.Data); err != nil {
@@ -34,7 +34,7 @@ func (s *serverImpl) Store(ctx context.Context, req *service.StoreRequest) (*ser
 	return &service.StoreResponse{}, nil
 }
 
-func (s *serverImpl) Retrieve(ctx context.Context, req *service.RetrieveRequest) (*service.RetrieveResponse, error) {
+func (s *serverImpl) RetrieveRecord(ctx context.Context, req *service.RetrieveRequest) (*service.RetrieveResponse, error) {
 
 	log.Println("BE server received a get request for", req.Id)
 
@@ -49,10 +49,10 @@ func (s *serverImpl) Retrieve(ctx context.Context, req *service.RetrieveRequest)
 	return reply, nil
 }
 
-func (s *serverImpl) Delete(ctx context.Context, req *service.DeleteRequest) (*service.DeleteResponse, error) {
+func (s *serverImpl) DeleteRecord(ctx context.Context, req *service.DeleteRequest) (*service.DeleteResponse, error) {
 
 	log.Println("BE server received a delete request for", req.Id)
-	
+
 	if err := s.db.DeleteRecord(req.Id); err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (s *serverImpl) Delete(ctx context.Context, req *service.DeleteRequest) (*s
 }
 
 func (s *serverImpl) Start() (err error) {
-	
+
 	// Listen on TCP port
 	lis, err := net.Listen("tcp", s.serverAddr)
 	if err != nil {
@@ -71,7 +71,7 @@ func (s *serverImpl) Start() (err error) {
 	// Create and register server
 	g := grpc.NewServer()
 	service.RegisterBackendServiceServer(g, s)
-	
+
 	if err := g.Serve(lis); err != nil {
 		return errors.New("Failed to serve: " + err.Error())
 	}

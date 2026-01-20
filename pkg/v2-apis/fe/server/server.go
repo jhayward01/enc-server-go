@@ -153,7 +153,7 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 
 	// Return retrieved record with key
 	retrievedRecord := record{
-		ID:	  idStr,
+		ID:   idStr,
 		Data: string(data),
 		Key:  keyStr,
 	}

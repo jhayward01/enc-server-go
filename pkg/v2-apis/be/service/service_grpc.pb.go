@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BackendService_Store_FullMethodName    = "/service.BackendService/Store"
-	BackendService_Retrieve_FullMethodName = "/service.BackendService/Retrieve"
-	BackendService_Delete_FullMethodName   = "/service.BackendService/Delete"
+	BackendService_StoreRecord_FullMethodName    = "/service.BackendService/StoreRecord"
+	BackendService_RetrieveRecord_FullMethodName = "/service.BackendService/RetrieveRecord"
+	BackendService_DeleteRecord_FullMethodName   = "/service.BackendService/DeleteRecord"
 )
 
 // BackendServiceClient is the client API for BackendService service.
@@ -30,9 +30,9 @@ const (
 //
 // The service definition
 type BackendServiceClient interface {
-	Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error)
-	Retrieve(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*RetrieveResponse, error)
-	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	StoreRecord(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error)
+	RetrieveRecord(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*RetrieveResponse, error)
+	DeleteRecord(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
 
 type backendServiceClient struct {
@@ -43,30 +43,30 @@ func NewBackendServiceClient(cc grpc.ClientConnInterface) BackendServiceClient {
 	return &backendServiceClient{cc}
 }
 
-func (c *backendServiceClient) Store(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error) {
+func (c *backendServiceClient) StoreRecord(ctx context.Context, in *StoreRequest, opts ...grpc.CallOption) (*StoreResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StoreResponse)
-	err := c.cc.Invoke(ctx, BackendService_Store_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, BackendService_StoreRecord_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *backendServiceClient) Retrieve(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*RetrieveResponse, error) {
+func (c *backendServiceClient) RetrieveRecord(ctx context.Context, in *RetrieveRequest, opts ...grpc.CallOption) (*RetrieveResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RetrieveResponse)
-	err := c.cc.Invoke(ctx, BackendService_Retrieve_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, BackendService_RetrieveRecord_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *backendServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+func (c *backendServiceClient) DeleteRecord(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, BackendService_Delete_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, BackendService_DeleteRecord_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -79,9 +79,9 @@ func (c *backendServiceClient) Delete(ctx context.Context, in *DeleteRequest, op
 //
 // The service definition
 type BackendServiceServer interface {
-	Store(context.Context, *StoreRequest) (*StoreResponse, error)
-	Retrieve(context.Context, *RetrieveRequest) (*RetrieveResponse, error)
-	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	StoreRecord(context.Context, *StoreRequest) (*StoreResponse, error)
+	RetrieveRecord(context.Context, *RetrieveRequest) (*RetrieveResponse, error)
+	DeleteRecord(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	mustEmbedUnimplementedBackendServiceServer()
 }
 
@@ -92,14 +92,14 @@ type BackendServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBackendServiceServer struct{}
 
-func (UnimplementedBackendServiceServer) Store(context.Context, *StoreRequest) (*StoreResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Store not implemented")
+func (UnimplementedBackendServiceServer) StoreRecord(context.Context, *StoreRequest) (*StoreResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StoreRecord not implemented")
 }
-func (UnimplementedBackendServiceServer) Retrieve(context.Context, *RetrieveRequest) (*RetrieveResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Retrieve not implemented")
+func (UnimplementedBackendServiceServer) RetrieveRecord(context.Context, *RetrieveRequest) (*RetrieveResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RetrieveRecord not implemented")
 }
-func (UnimplementedBackendServiceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
+func (UnimplementedBackendServiceServer) DeleteRecord(context.Context, *DeleteRequest) (*DeleteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteRecord not implemented")
 }
 func (UnimplementedBackendServiceServer) mustEmbedUnimplementedBackendServiceServer() {}
 func (UnimplementedBackendServiceServer) testEmbeddedByValue()                        {}
@@ -122,56 +122,56 @@ func RegisterBackendServiceServer(s grpc.ServiceRegistrar, srv BackendServiceSer
 	s.RegisterService(&BackendService_ServiceDesc, srv)
 }
 
-func _BackendService_Store_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BackendService_StoreRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StoreRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BackendServiceServer).Store(ctx, in)
+		return srv.(BackendServiceServer).StoreRecord(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: BackendService_Store_FullMethodName,
+		FullMethod: BackendService_StoreRecord_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BackendServiceServer).Store(ctx, req.(*StoreRequest))
+		return srv.(BackendServiceServer).StoreRecord(ctx, req.(*StoreRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BackendService_Retrieve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BackendService_RetrieveRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RetrieveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BackendServiceServer).Retrieve(ctx, in)
+		return srv.(BackendServiceServer).RetrieveRecord(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: BackendService_Retrieve_FullMethodName,
+		FullMethod: BackendService_RetrieveRecord_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BackendServiceServer).Retrieve(ctx, req.(*RetrieveRequest))
+		return srv.(BackendServiceServer).RetrieveRecord(ctx, req.(*RetrieveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BackendService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BackendService_DeleteRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BackendServiceServer).Delete(ctx, in)
+		return srv.(BackendServiceServer).DeleteRecord(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: BackendService_Delete_FullMethodName,
+		FullMethod: BackendService_DeleteRecord_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BackendServiceServer).Delete(ctx, req.(*DeleteRequest))
+		return srv.(BackendServiceServer).DeleteRecord(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -184,16 +184,16 @@ var BackendService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*BackendServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Store",
-			Handler:    _BackendService_Store_Handler,
+			MethodName: "StoreRecord",
+			Handler:    _BackendService_StoreRecord_Handler,
 		},
 		{
-			MethodName: "Retrieve",
-			Handler:    _BackendService_Retrieve_Handler,
+			MethodName: "RetrieveRecord",
+			Handler:    _BackendService_RetrieveRecord_Handler,
 		},
 		{
-			MethodName: "Delete",
-			Handler:    _BackendService_Delete_Handler,
+			MethodName: "DeleteRecord",
+			Handler:    _BackendService_DeleteRecord_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

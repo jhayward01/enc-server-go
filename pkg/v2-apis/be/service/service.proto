@@ -6,9 +6,9 @@ option go_package = "./service";
 
 // The service definition
 service BackendService {
-  rpc Store (StoreRequest) returns (StoreResponse) {}
-  rpc Retrieve (RetrieveRequest) returns (RetrieveResponse) {}
-  rpc Delete (DeleteRequest) returns (DeleteResponse) {}
+  rpc StoreRecord (StoreRequest) returns (StoreResponse) {}
+  rpc RetrieveRecord (RetrieveRequest) returns (RetrieveResponse) {}
+  rpc DeleteRecord (DeleteRequest) returns (DeleteResponse) {}
 }
 
 message StoreRequest {
