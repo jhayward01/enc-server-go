@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Dialer struct {}
+type Dialer struct{}
 
 func (d *Dialer) Dial(serverAddr string) (conn *grpc.ClientConn, s BackendServiceClient,
 	ctx context.Context, cancel context.CancelFunc, err error) {

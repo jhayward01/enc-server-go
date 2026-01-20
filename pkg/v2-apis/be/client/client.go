@@ -101,7 +101,7 @@ func MakeClient(configs map[string]string) (c utils.ClientBE, err error) {
 	// Build client implementation.
 	c = &clientImpl{
 		serverAddr: configs["serverAddr"],
-		dialer: service.Dialer{},
+		dialer:     service.Dialer{},
 	}
 
 	return c, nil

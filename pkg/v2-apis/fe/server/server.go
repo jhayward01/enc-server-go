@@ -14,7 +14,7 @@ import (
 	"enc-server-go/pkg/v2-apis/be/client"
 )
 
-type record struct {
+type Record struct {
 	ID   string `json:"id"`
 	Key  string `json:"key"`
 	Data string `json:"data"`
@@ -41,7 +41,7 @@ type serverImpl struct {
 func (s *serverImpl) postRecord(c *gin.Context) {
 
 	// Extract record ID and data
-	var newRecord record
+	var newRecord Record
 	if err := c.BindJSON(&newRecord); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -152,7 +152,7 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 	}
 
 	// Return retrieved record with key
-	retrievedRecord := record{
+	retrievedRecord := Record{
 		ID:   idStr,
 		Data: string(data),
 		Key:  keyStr,

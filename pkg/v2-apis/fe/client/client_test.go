@@ -7,11 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"enc-server-go/pkg/utils"
-	"enc-server-go/pkg/v2-apis/be/service"
 )
 
 // Test Constants
-const serverAddr = "enc-server-go-be:8888"
+const serverAddr = "localhost:7777"
 
 const idStr = "JTH"
 const idHexStr = "4a5448"
@@ -28,7 +27,6 @@ var (
 
 	goodClient = &clientImpl{
 		serverAddr: serverAddr,
-		dialer:     service.Dialer{},
 	}
 )
 
@@ -43,7 +41,7 @@ func TestClient_MakeClient(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    utils.ClientBE
+		want    utils.ClientFE
 		wantErr error
 	}{
 		{

@@ -106,7 +106,7 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 	if err = json.Unmarshal(data, &newRecord); err != nil {
 		return nil, errors.New("Error unmarshalling record: " + err.Error())
 	}
-	
+
 	// TODO make sure this is consistent
 	return []byte(newRecord.Data), nil
 }
