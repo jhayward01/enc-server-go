@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/maps"
-	
+
 	"enc-server-go/pkg/utils"
 )
 

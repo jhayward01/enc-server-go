@@ -159,7 +159,7 @@ func TestServer_StoreRecord(t *testing.T) {
 				},
 			},
 			want: &service.StoreResponse{},
-		},{
+		}, {
 			name: "should fail on database client StoreRecord()",
 			fields: fields{
 				db: &MockDB{t, "Store"},
@@ -210,20 +210,20 @@ func TestServer_RetrieveRecord(t *testing.T) {
 			},
 			args: args{
 				req: &service.RetrieveRequest{
-					Id:   idHexEncStr,
+					Id: idHexEncStr,
 				},
 			},
 			want: &service.RetrieveResponse{
 				Data: recordHexEncStr,
 			},
-		},{
+		}, {
 			name: "should fail on database client RetrieveRecord()",
 			fields: fields{
 				db: &MockDB{t, "Retrieve"},
 			},
 			args: args{
 				req: &service.RetrieveRequest{
-					Id:   idHexEncStr,
+					Id: idHexEncStr,
 				},
 			},
 			wantErr: errors.New(badDBClientMessage),
@@ -242,7 +242,6 @@ func TestServer_RetrieveRecord(t *testing.T) {
 		})
 	}
 }
-
 
 // DeleteRecord() - Test Method
 func TestServer_DeleteRecord(t *testing.T) {
@@ -267,18 +266,18 @@ func TestServer_DeleteRecord(t *testing.T) {
 			},
 			args: args{
 				req: &service.DeleteRequest{
-					Id:   idHexEncStr,
+					Id: idHexEncStr,
 				},
 			},
 			want: &service.DeleteResponse{},
-		},{
+		}, {
 			name: "should fail on database client DeleteRecord()",
 			fields: fields{
 				db: &MockDB{t, "Delete"},
 			},
 			args: args{
 				req: &service.DeleteRequest{
-					Id:   idHexEncStr,
+					Id: idHexEncStr,
 				},
 			},
 			wantErr: errors.New(badDBClientMessage),

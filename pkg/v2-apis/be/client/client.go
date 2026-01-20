@@ -1,13 +1,9 @@
 package client
 
 import (
-	"context"
 	"encoding/hex"
 	"errors"
 	"log"
-	"time"
-
-	"google.golang.org/grpc"
 
 	"enc-server-go/pkg/utils"
 	"enc-server-go/pkg/v2-apis/be/service"
@@ -16,6 +12,7 @@ import (
 // Client implementation.
 type clientImpl struct {
 	serverAddr string
+	dialer     service.Dialer
 }
 
 func (c *clientImpl) StoreRecord(id, data []byte) (err error) {
@@ -27,16 +24,11 @@ func (c *clientImpl) StoreRecord(id, data []byte) (err error) {
 	log.Println("BE client received a store request for", idStr)
 
 	// GRPC connection
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
+	conn, s, ctx, cancel, err := c.dialer.Dial(c.serverAddr)
 	if err != nil {
 		return errors.New("Error connecting to backend server: " + err.Error())
 	}
-	defer conn.Close()
-
-	// Create service and context
-	s := service.NewBackendServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	defer c.dialer.Close(conn, cancel)
 
 	// Process store request
 	req := &service.StoreRequest{Id: idStr, Data: dataStr}
@@ -55,16 +47,11 @@ func (c *clientImpl) RetrieveRecord(id []byte) (data []byte, err error) {
 	log.Println("BE client received a get request for", idStr)
 
 	// GRPC connection
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
+	conn, s, ctx, cancel, err := c.dialer.Dial(c.serverAddr)
 	if err != nil {
 		return nil, errors.New("Error connecting to backend server: " + err.Error())
 	}
-	defer conn.Close()
-
-	// Create service and context
-	s := service.NewBackendServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	defer c.dialer.Close(conn, cancel)
 
 	// Process get request
 	req := &service.RetrieveRequest{Id: idStr}
@@ -89,16 +76,11 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	log.Println("BE client received a delete request for", idStr)
 
 	// GRPC connection
-	conn, err := grpc.Dial(c.serverAddr, grpc.WithInsecure(), grpc.WithBlock())
+	conn, s, ctx, cancel, err := c.dialer.Dial(c.serverAddr)
 	if err != nil {
 		return errors.New("Error connecting to backend server: " + err.Error())
 	}
-	defer conn.Close()
-
-	// Create service and context
-	s := service.NewBackendServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	defer c.dialer.Close(conn, cancel)
 
 	// Process delete request
 	req := &service.DeleteRequest{Id: idStr}
@@ -119,6 +101,7 @@ func MakeClient(configs map[string]string) (c utils.ClientBE, err error) {
 	// Build client implementation.
 	c = &clientImpl{
 		serverAddr: configs["serverAddr"],
+		dialer: service.Dialer{},
 	}
 
 	return c, nil

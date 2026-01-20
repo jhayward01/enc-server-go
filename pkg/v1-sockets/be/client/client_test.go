@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"enc-server-go/pkg/utils"
-
 	"github.com/stretchr/testify/assert"
+
+	"enc-server-go/pkg/utils"
 )
 
 // Test Constants
