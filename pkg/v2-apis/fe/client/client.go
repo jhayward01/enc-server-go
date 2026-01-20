@@ -51,15 +51,15 @@ func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 	}
 	defer resp.Body.Close()
 
+	// Verify HTTP status code
+	if resp.StatusCode != http.StatusCreated {
+		return nil, errors.New("Bad status making POST request: " + resp.Status)
+	}
+
 	// Read response body
 	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("Error reading response: " + err.Error())
-	}
-
-	// Verify HTTP status code
-	if resp.StatusCode != http.StatusCreated {
-		return nil, errors.New("Bad status making POST request: " + resp.Status + " " + string(data))
 	}
 
 	// Unmarshall record fields
@@ -90,15 +90,15 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 	}
 	defer resp.Body.Close()
 
+	// Verify HTTP status code
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("Bad status making GET request: " + resp.Status)
+	}
+
 	// Read response body
 	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("Error reading response: " + err.Error())
-	}
-
-	// Verify HTTP status code
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("Bad status making GET request: " + resp.Status + " " + string(data))
 	}
 
 	// Unmarshall record fields
@@ -106,7 +106,8 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 	if err = json.Unmarshal(data, &newRecord); err != nil {
 		return nil, errors.New("Error unmarshalling record: " + err.Error())
 	}
-
+	
+	// TODO make sure this is consistent
 	return []byte(newRecord.Data), nil
 }
 
@@ -132,15 +133,9 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	}
 	defer resp.Body.Close()
 
-	// Read response body
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return errors.New("Error reading response: " + err.Error())
-	}
-
 	// Verify HTTP status code
 	if resp.StatusCode != http.StatusAccepted {
-		return errors.New("Bad status making DELETE request: " + resp.Status + " " + string(data))
+		return errors.New("Bad status making DELETE request: " + resp.Status)
 	}
 
 	return nil
