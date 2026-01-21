@@ -68,9 +68,12 @@ func (s *serverImpl) Start() (err error) {
 		return errors.New("Failed to listen: " + err.Error())
 	}
 
+
 	// Create and register server
 	g := grpc.NewServer()
 	service.RegisterBackendServiceServer(g, s)
+	
+	log.Println("Listening and serving GRPC on", s.serverAddr)
 
 	if err := g.Serve(lis); err != nil {
 		return errors.New("Failed to serve: " + err.Error())
@@ -97,7 +100,7 @@ func MakeServer(configs map[string]string) (s Server, err error) {
 	// Build server implementation.
 	si := &serverImpl{
 		db:         db,
-		serverAddr: "localhost:" + configs["port"],
+		serverAddr: ":" + configs["port"],
 	}
 
 	return si, nil

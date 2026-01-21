@@ -63,7 +63,7 @@ var (
 		"idNonceStr": idNonceStr,
 		"keySize":    keySizeStr,
 		"port":       port,
-		"serverAddr": "localhost:" + port,
+		"serverAddr": ":" + port,
 	}
 
 	goodServer = &serverImpl{
@@ -71,7 +71,7 @@ var (
 		idNonce:    idNonce,
 		idCipher:   idCipher,
 		beClient:   goodClient,
-		serverAddr: "localhost:" + port,
+		serverAddr: ":" + port,
 	}
 
 	badServerConfig = map[string]string{

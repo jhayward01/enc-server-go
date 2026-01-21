@@ -37,7 +37,7 @@ var (
 
 	goodServer = &serverImpl{
 		db:         goodDB,
-		serverAddr: "localhost:8888",
+		serverAddr: ":8888",
 	}
 
 	badDBConfig = func() map[string]string {

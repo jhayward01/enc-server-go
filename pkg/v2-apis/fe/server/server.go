@@ -236,7 +236,7 @@ func MakeServer(configs map[string]string,
 
 		beClient: beClient,
 
-		serverAddr: "localhost:" + configs["port"],
+		serverAddr: ":" + configs["port"],
 	}
 
 	return si, nil
