@@ -86,7 +86,7 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 	getURL := "http://" + c.serverAddr + "/records/" + idStr + "?key=" + keyStr
 	resp, err := http.Get(getURL)
 	if err != nil {
-		return nil, errors.New("Error making GET request: " + err.Error())
+		return nil, errors.New("Error making GET request: " + err.Error()) 
 	}
 	defer resp.Body.Close()
 
