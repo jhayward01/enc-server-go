@@ -33,9 +33,5 @@ jobs:
     - name: Integration Test 
       run: make itests
 
-    - name: Dump docker logs on failure
-      if: failure()
-      uses: jwalton/gh-docker-logs@v2
-
     - name: Stop Servers
       run: make stop
