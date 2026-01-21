@@ -1,5 +1,8 @@
 Started feclient
-Running in v1 mode
+Running in v2 mode
 record PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS
+FE client received a store request for 4a5448
+FE client received a get request for 4a5448 f10bd802c04cdb3db23d722ffcae222d1ebf7fa39c13b424b4402d0c20498ff5
 retrieved PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS
+FE client received a delete request for 4a5448
 deleted record
