@@ -51,15 +51,15 @@ func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 	}
 	defer resp.Body.Close()
 
-	// Verify HTTP status code
-	if resp.StatusCode != http.StatusCreated {
-		return nil, errors.New("Bad status making POST request: " + resp.Status)
-	}
-
 	// Read response body
 	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("Error reading response: " + err.Error())
+	}
+	
+	// Verify HTTP status code
+	if resp.StatusCode != http.StatusCreated {
+		return nil, errors.New("Bad status making POST request: " + resp.Status + string(data))
 	}
 
 	// Unmarshall record fields
@@ -80,7 +80,7 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 	idStr := hex.EncodeToString(id)
 	keyStr := hex.EncodeToString(key)
 
-	log.Println("FE client received a get request for", idStr, keyStr)
+	log.Println("FE client received a get request for", idStr)
 
 	// Get request to FE server
 	getURL := "http://" + c.serverAddr + "/records/" + idStr + "?key=" + keyStr
@@ -90,15 +90,15 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 	}
 	defer resp.Body.Close()
 
-	// Verify HTTP status code
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("Bad status making GET request: " + resp.Status)
-	}
-
 	// Read response body
 	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("Error reading response: " + err.Error())
+	}
+
+	// Verify HTTP status code
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("Bad status making GET request: " + resp.Status + string(data))
 	}
 
 	// Unmarshall record fields
