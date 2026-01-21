@@ -19,7 +19,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-    entrypoint: beserver
+    entrypoint: beserver --v2
     hostname: enc-server-go-be
           
   enc-server-go-fe:
@@ -31,7 +31,7 @@ services:
       restart_policy:
         condition: on-failure
     container_name: enc-server-go-fe
-    entrypoint: feserver
+    entrypoint: feserver --v2
     hostname: enc-server-go-fe
     ports:
       - 7777:7777
