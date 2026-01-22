@@ -40,11 +40,13 @@ func (db *dbImpl) getRecordCollection() (coll *mongo.Collection, err error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Println("Data store connected...")
 
 	// Verify connectivity.
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		return nil, err
 	}
+	log.Println("Data store ping verified...")
 
 	// Retrieve record collection.
 	coll = client.Database("enc-server-go").Collection("records")
