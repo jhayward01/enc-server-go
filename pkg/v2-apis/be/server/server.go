@@ -28,6 +28,7 @@ func (s *serverImpl) StoreRecord(ctx context.Context, req *service.StoreRequest)
 	log.Println("BE server received a store request for", req.Id)
 
 	if err := s.db.StoreRecord(req.Id, req.Data); err != nil {
+		log.Println("BE server StoreRecord error:", err)
 		return nil, err
 	}
 
@@ -40,6 +41,7 @@ func (s *serverImpl) RetrieveRecord(ctx context.Context, req *service.RetrieveRe
 
 	record, err := s.db.RetrieveRecord(req.Id)
 	if err != nil {
+		log.Println("BE server RetrieveRecord error:", err)
 		return nil, err
 	}
 
@@ -54,6 +56,7 @@ func (s *serverImpl) DeleteRecord(ctx context.Context, req *service.DeleteReques
 	log.Println("BE server received a delete request for", req.Id)
 
 	if err := s.db.DeleteRecord(req.Id); err != nil {
+		log.Println("BE server DeleteRecord error:", err)
 		return nil, err
 	}
 
