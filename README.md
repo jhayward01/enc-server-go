@@ -83,7 +83,7 @@ interacts with a MongoDB instance to provide persistent storage of data.
 ```
 make help                # Print makefile reference
 make fmt                 # Run format and static analysis tools
-make proto				# Build GRPC protos
+make proto               # Build GRPC protos
 make build               # Build repo
 make test                # Test repo
 make build-all           # Format, build, and test repo
@@ -143,7 +143,7 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 The v1 version of this repository was written using direct socket communication
 between microservices. The current v2 version uses Gin Framework RESTful API for
 the front-end service and Golang GRPC for the back-end service. Command line 
-parameter `--v1` can be used to test socket communication mode.
+parameter `--v1` can be used to test the original socket communication mode.
 
 ## Further Work ##
 
