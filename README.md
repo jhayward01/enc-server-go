@@ -121,24 +121,27 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 
 * [pkg](pkg) - Defines clients, servers, and utilities for all microservices.
 
-	* [fe](pkg/fe) - Front-end service providing data encryption.
+	* [fe](pkg/v2-apis/fe) - Front-end service providing data encryption.
 	
-		* [client](pkg/fe/client)
+		* [client](pkg/v2-apis/fe/client)
 		
-		* [server](pkg/fe/server)
+		* [server](pkg/v2-apis/fe/server)
 
 	* [be](pkg/be) - Back-end service providing data storage.
 	
-		* [client](pkg/be/client)
+		* [client](pkg/v2-apis/be/client)
 		
-		* [server](pkg/be/server)
+		* [server](pkg/v2-apis/be/server)
 	
-	* [utils](utils) - Defines shared utilities, including configuration readers, logging, database clients, and network IO.
+	* [utils](pkg/utils) - Defines shared utilities, including configuration readers, logging, database clients, and network IO.
 
 * [test](test) - Defines integration tests.
 
 ## Release Notes ##
 The v1 version of this repository was written using direct socket communication
+between microservices. The current v2 version uses Gin Framework RESTful API for
+the front-end service and Golang GRPC for the back-end service. Command line 
+parameter `--v1` can be used to test socket communication mode.
 
 ## Further Work ##
 
