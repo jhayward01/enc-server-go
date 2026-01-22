@@ -63,7 +63,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to store record: %v", err)
 	}
-	log.Println("key", "len="+strconv.Itoa(len(key)), hex.EncodeToString(key))
 
 	// Retrieve record.
 	retrieved, err := c.RetrieveRecord(id, key)
