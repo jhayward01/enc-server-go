@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"flag"
 	"log"
-	"strconv"
 
 	client1 "enc-server-go/pkg/v1-sockets/fe/client"
 	client2 "enc-server-go/pkg/v2-apis/fe/client"
