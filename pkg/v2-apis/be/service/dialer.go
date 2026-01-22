@@ -21,7 +21,7 @@ func (d *Dialer) Dial(serverAddr string) (conn *grpc.ClientConn, s BackendServic
 
 	// Create service and context
 	s = NewBackendServiceClient(conn)
-	ctx, cancel = context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 
 	return conn, s, ctx, cancel, nil
 }
