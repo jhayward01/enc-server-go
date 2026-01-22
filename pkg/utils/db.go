@@ -55,6 +55,11 @@ func (db *dbImpl) getRecordCollection() (coll *mongo.Collection, err error) {
 
 func (db *dbImpl) StoreRecord(id, record string) (err error) {
 
+	log.Println("Storing record on data store")
+	
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+    
 	// Get reference to record collection.
 	coll, err := db.getRecordCollection()
 	if err != nil {
@@ -81,6 +86,11 @@ func (db *dbImpl) StoreRecord(id, record string) (err error) {
 
 func (db *dbImpl) RetrieveRecord(id string) (record string, err error) {
 
+	log.Println("Retrieving record on data store")
+	
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
 	// Get reference to record collection.
 	coll, err := db.getRecordCollection()
 	if err != nil {
@@ -92,7 +102,7 @@ func (db *dbImpl) RetrieveRecord(id string) (record string, err error) {
 
 	// Query record entry.
 	var entry Entry
-	if err = coll.FindOne(context.TODO(), filter).Decode(&entry); err != nil {
+	if err = coll.FindOne(ctx, filter).Decode(&entry); err != nil {
 		return "", err
 	}
 
@@ -104,6 +114,11 @@ func (db *dbImpl) RetrieveRecord(id string) (record string, err error) {
 
 func (db *dbImpl) DeleteRecord(id string) (err error) {
 
+	log.Println("Deleting record on data store")
+	
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
 	// Get reference to record collection.
 	coll, err := db.getRecordCollection()
 	if err != nil {
@@ -113,7 +128,7 @@ func (db *dbImpl) DeleteRecord(id string) (err error) {
 	filter := bson.D{primitive.E{Key: "id", Value: id}}
 	opts := options.Delete().SetHint(bson.D{{Key: "_id", Value: 1}})
 
-	result, err := coll.DeleteMany(context.TODO(), filter, opts)
+	result, err := coll.DeleteMany(ctx, filter, opts)
 	if err != nil {
 		return err
 	}
