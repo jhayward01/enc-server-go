@@ -3,7 +3,7 @@ This project implements a web-based encryption application in Go. Two
 microservices are defined in this project - a _front-end_ and _back-end_ 
 service. Both contain client and server components.
 
-The _front-end_ service defines three endpoints served by a Gin Framework RESTful API:
+The front-end service defines three endpoints served by a Gin Framework RESTful API:
 
 * _StoreRecord_ - This endpoint accepts requests to store a record associated 
 with a user ID. The records are encrypted with a randomly-generated 32-bit 
@@ -19,7 +19,7 @@ it to the user.
 
 * _DeleteRecord_ - This endpoint accepts requests for record deletion via a user ID. 
 	
-The _back-end_ service defines three parallel endpoints for storing and 
+The back-end service defines three parallel endpoints for storing and 
 retrieving encrypted user data, served by a Golang GRPC API. This microservice 
 interacts with a MongoDB instance to provide persistent storage of data.
 
@@ -46,6 +46,8 @@ interacts with a MongoDB instance to provide persistent storage of data.
 2. Start the microservices in separate terminals.
     ```
     make server-be-cmd
+    ```
+    ```
     make server-fe-cmd
     ```
     
@@ -127,7 +129,7 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 		
 		* [server](pkg/v2-apis/fe/server)
 
-	* [be](pkg/be) - Back-end service providing data storage.
+	* [be](pkg/v2-apis/be) - Back-end service providing data storage.
 	
 		* [client](pkg/v2-apis/be/client)
 		
