@@ -21,6 +21,7 @@ spec:
         - name: ENC_SERVER_GO_CONFIG_PATH
           value: "config/config.kube.yaml"
         command: ["feserver"]
+        args: ["--v2"]
         ports:
         - containerPort: 7777
 ---
