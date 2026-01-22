@@ -6,7 +6,6 @@ help:
 fmt:
 	gofmt -s -w .
 	go vet ./...
-	# staticcheck ./...	# Not yet compatible with go 1.25 
 
 # make proto				# Build GRPC protos
 proto:
@@ -17,7 +16,8 @@ build:
 	go build -v ./...
 
 # make test                # Test repo
-test: tests
+test::
+	go test -v ./...
 
 # make build-all           # Format, build, and test repo
 build-all: fmt proto build test

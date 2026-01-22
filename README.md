@@ -138,7 +138,7 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 * [test](test) - Defines integration tests.
 
 ## Release Notes ##
-
+The v1 version of this repository was written using direct socket communication
 
 ## Further Work ##
 
