@@ -3,7 +3,7 @@ This project implements a web-based encryption application in Go. Two
 microservices are defined in this project - a _front-end_ and _back-end_ 
 service. Both contain client and server components.
 
-The _front-end_ service defines three endpoints:
+The _front-end_ service defines three endpoints served by a Gin Framework RESTful API:
 
 * _StoreRecord_ - This endpoint accepts requests to store a record associated 
 with a user ID. The records are encrypted with a randomly-generated 32-bit 
@@ -20,8 +20,8 @@ it to the user.
 * _DeleteRecord_ - This endpoint accepts requests for record deletion via a user ID. 
 	
 The _back-end_ service defines three parallel endpoints for storing and 
-retrieving encrypted user data. This microservice interacts with a MongoDB 
-instance to provide persistent storage of data.
+retrieving encrypted user data, served by a Golang GRPC API. This microservice 
+interacts with a MongoDB instance to provide persistent storage of data.
 
 ## Running Microservices in Docker Compose (Recommended) ##
 1. Start the microservices in _docker-compose_.
@@ -81,8 +81,9 @@ instance to provide persistent storage of data.
 ```
 make help                # Print makefile reference
 make fmt                 # Run format and static analysis tools
+make proto				# Build GRPC protos
 make build               # Build repo
-make tests               # Test repo
+make test                # Test repo
 make build-all           # Format, build, and test repo
 make install-client-fe   # Install FE client
 make install-client-be   # Install BE client
@@ -91,6 +92,7 @@ make install-server-be   # Install BE server
 make install-servers     # Install BE/FE servers
 make all                 # Install all binaries
 make client              # Run FE client
+make be-client           # Run BE client
 make servers             # Run BE/FE servers in docker-compose
 make itests              # Run integration tests
 make stop                # Stop BE/FE servers in docker-compose
@@ -135,6 +137,9 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 
 * [test](test) - Defines integration tests.
 
+## Release Notes ##
+
+
 ## Further Work ##
 
 * ~~Refactor out remaining redundancies.~~
@@ -147,4 +152,4 @@ make stop-cluster        # Stop application in local Kubernetes cluster
 
 * ~~Create Kubernetes configuration.~~
 
-* Implement alternate HTTP/GRPC service communication.
+* ~~Implement alternate HTTP/GRPC service communication.~~

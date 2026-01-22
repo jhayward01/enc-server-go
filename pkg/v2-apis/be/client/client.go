@@ -94,7 +94,7 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 func MakeClient(configs map[string]string) (c utils.ClientBE, err error) {
 
 	log.Println("BE client MakeClient with configs:", configs)
-	
+
 	// Verify required configurations.
 	if ok, missing := utils.VerifyConfigs(configs, []string{"serverAddr"}); !ok {
 		return nil, errors.New("MakeClient missing configuration " + missing)

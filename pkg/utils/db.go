@@ -31,9 +31,9 @@ type Entry struct {
 func (db *dbImpl) getRecordCollection() (coll *mongo.Collection, err error) {
 
 	log.Println("Connecting to data store...")
-	
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	// Create Mongo client.
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(db.mongoURI))
@@ -56,7 +56,7 @@ func (db *dbImpl) getRecordCollection() (coll *mongo.Collection, err error) {
 func (db *dbImpl) StoreRecord(id, record string) (err error) {
 
 	log.Println("Storing record on data store")
-    
+
 	// Get reference to record collection.
 	coll, err := db.getRecordCollection()
 	if err != nil {
@@ -69,9 +69,9 @@ func (db *dbImpl) StoreRecord(id, record string) (err error) {
 		Value: bson.D{primitive.E{Key: "record", Value: record}}}}
 	opts := options.Update().SetUpsert(true)
 
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
-    
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	// Update record record.
 	result, err := coll.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
@@ -96,9 +96,9 @@ func (db *dbImpl) RetrieveRecord(id string) (record string, err error) {
 
 	// Set query parameters.
 	filter := bson.D{primitive.E{Key: "id", Value: id}}
-	
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	// Query record entry.
 	var entry Entry
@@ -125,9 +125,9 @@ func (db *dbImpl) DeleteRecord(id string) (err error) {
 	// Set query parameters.
 	filter := bson.D{primitive.E{Key: "id", Value: id}}
 	opts := options.Delete().SetHint(bson.D{{Key: "_id", Value: 1}})
-	
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	result, err := coll.DeleteMany(ctx, filter, opts)
 	if err != nil {

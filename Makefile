@@ -15,10 +15,6 @@ proto:
 # make build               # Build repo
 build:
 	go build -v ./...
-	
-# make tests               # Test repo (alt.)
-tests:
-	go test -v ./...
 
 # make test                # Test repo
 test: tests
@@ -50,18 +46,10 @@ all: install-client install-servers
 
 # make client              # Run FE client
 client: install-client-fe
-	feclient
-
-# make client-2            # Run FE client v2
-client-2: install-client-fe
 	feclient --v2
 
 # make be-client           # Run BE client
 be-client: install-client-be
-	beclient --v2
-
-# make be-client-2         # Run BE client v2
-be-client-2: install-client-be
 	beclient --v2
 
 # make servers             # Run BE/FE servers in docker-compose
@@ -78,18 +66,10 @@ stop:
 
 # make server-be-cmd       # Run BE server in terminal
 server-be-cmd: install-servers
-	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' beserver
-
-# make server-be-cmd-2     # Run BE server v2 in terminal
-server-be-cmd-2: install-servers
 	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' beserver --v2
 
 # make server-fe-cmd       # Run FE server in terminal
 server-fe-cmd: install-servers
-	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' feserver
-
-# make server-fe-cmd-2     # Run FE server v2 in terminal
-server-fe-cmd-2: install-servers
 	ENC_SERVER_GO_CONFIG_PATH='config/config.cmd.yaml' feserver --v2
 
 # make start-cluster       # Start application in local Kubernetes cluster

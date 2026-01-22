@@ -218,7 +218,7 @@ func (s *serverImpl) Start() (err error) {
 
 func MakeServer(configs map[string]string,
 	beClientConfigs map[string]string) (s Server, err error) {
-		
+
 	log.Println("FE server MakeServer with configs:", configs, beClientConfigs)
 
 	// Verify required configurations.

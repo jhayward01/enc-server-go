@@ -17,7 +17,7 @@ func main() {
 
 	// Comand line
 	var v2 bool
-	flag.BoolVar(&v2, "v2", false, "Run in v2 mode")
+	flag.BoolVar(&v2, "v2", true, "Run in v2 mode")
 	flag.Parse()
 
 	// Logging

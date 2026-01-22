@@ -56,7 +56,7 @@ func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 	if err != nil {
 		return nil, errors.New("Error reading response: " + err.Error())
 	}
-	
+
 	// Verify HTTP status code
 	if resp.StatusCode != http.StatusCreated {
 		return nil, errors.New("Bad status making POST request: " + resp.Status + string(data))
@@ -142,7 +142,7 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 }
 
 func MakeClient(configs map[string]string) (c utils.ClientFE, err error) {
-	
+
 	log.Println("FE client MakeClient with configs:", configs)
 
 	// Verify required configurations.
