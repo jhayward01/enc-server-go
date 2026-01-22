@@ -73,7 +73,7 @@ func (db *dbImpl) StoreRecord(id, record string) (err error) {
 	opts := options.Update().SetUpsert(true)
 
 	// Update record record.
-	result, err := coll.UpdateOne(context.TODO(), filter, update, opts)
+	result, err := coll.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
 		return err
 	}
