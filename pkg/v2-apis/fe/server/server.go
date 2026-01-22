@@ -43,6 +43,7 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	// Extract record ID and data
 	var newRecord Record
 	if err := c.BindJSON(&newRecord); err != nil {
+		log.Println("FE server postRecord error:", err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -52,6 +53,7 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	// Extract ID to hex
 	id, err := hex.DecodeString(newRecord.ID)
 	if err != nil {
+		log.Println("FE server postRecord error:", err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -59,6 +61,7 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	// Extract data to hex
 	data, err := hex.DecodeString(newRecord.Data)
 	if err != nil {
+		log.Println("FE server postRecord error:", err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -69,6 +72,7 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	// Generate random AES key.
 	key, err := s.keygen.RandomKey()
 	if err != nil {
+		log.Println("FE server postRecord error:", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -76,6 +80,7 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	// Generate key, cipher, and nonce for record.
 	cipher, err := s.keygen.GetGCMCipher(key)
 	if err != nil {
+		log.Println("FE server postRecord error:", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -83,6 +88,7 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	// Randomly generate nonce (initialization vector).
 	nonce, err := s.keygen.RandomNonce(cipher.NonceSize())
 	if err != nil {
+		log.Println("FE server postRecord error:", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -90,6 +96,7 @@ func (s *serverImpl) postRecord(c *gin.Context) {
 	// Generate cipher entry for record. Place in data store.
 	recordEncrypt := cipher.Seal(nonce, nonce, data, nil)
 	if err := s.beClient.StoreRecord(idEncrypt, recordEncrypt); err != nil {
+		log.Println("FE server postRecord error:", err)
 		c.IndentedJSON(http.StatusBadGateway, gin.H{"message": err.Error()})
 		return
 	}
@@ -107,6 +114,7 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 
 	// Verify paramaters
 	if keyStr == "" {
+		log.Println("FE server getRecord error: key not defined")
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "key not defined"})
 		return
 	}
@@ -114,6 +122,7 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 	// Extract ID to hex
 	id, err := hex.DecodeString(idStr)
 	if err != nil {
+		log.Println("FE server getRecord error:", err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -121,6 +130,7 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 	// Extract key to hex
 	key, err := hex.DecodeString(keyStr)
 	if err != nil {
+		log.Println("FE server getRecord error:", err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -131,6 +141,7 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 	// Generate cipher for record.
 	cipher, err := s.keygen.GetGCMCipher(key)
 	if err != nil {
+		log.Println("FE server getRecord error:", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -138,6 +149,7 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 	// Retrieve record from data store.
 	recordEncrypt, err := s.beClient.RetrieveRecord(idEncrypt)
 	if err != nil {
+		log.Println("FE server getRecord error:", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -147,6 +159,7 @@ func (s *serverImpl) getRecord(c *gin.Context) {
 	nonce := recordEncrypt[:cipher.NonceSize()]
 	remainder := recordEncrypt[cipher.NonceSize():]
 	if data, err = cipher.Open(nil, nonce, remainder, nil); err != nil {
+		log.Println("FE server getRecord error:", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -168,6 +181,7 @@ func (s *serverImpl) deleteRecord(c *gin.Context) {
 	// Extract ID to hex
 	id, err := hex.DecodeString(idStr)
 	if err != nil {
+		log.Println("FE server deleteRecord error:", err)
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
@@ -177,6 +191,7 @@ func (s *serverImpl) deleteRecord(c *gin.Context) {
 
 	// Delete record from data store.
 	if err = s.beClient.DeleteRecord(idEncrypt); err != nil {
+		log.Println("FE server deleteRecord error:", err)
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -203,6 +218,8 @@ func (s *serverImpl) Start() (err error) {
 
 func MakeServer(configs map[string]string,
 	beClientConfigs map[string]string) (s Server, err error) {
+		
+	log.Println("FE server MakeServer with configs:", configs, beClientConfigs)
 
 	// Verify required configurations.
 	if ok, missing := utils.VerifyConfigs(configs,

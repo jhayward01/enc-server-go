@@ -87,6 +87,8 @@ func (s *serverImpl) Start() (err error) {
 
 func MakeServer(configs map[string]string) (s Server, err error) {
 
+	log.Println("BE server MakeServer with configs:", configs)
+	
 	// Build data store wrapper.
 	db, err := utils.MakeDB(configs)
 	if err != nil {
