@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -30,15 +31,18 @@ type Entry struct {
 func (db *dbImpl) getRecordCollection() (coll *mongo.Collection, err error) {
 
 	log.Println("Connecting to data store...")
+	
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
 
 	// Create Mongo client.
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.mongoURI))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(db.mongoURI))
 	if err != nil {
 		return nil, err
 	}
 
 	// Verify connectivity.
-	if err = client.Ping(context.TODO(), readpref.Primary()); err != nil {
+	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		return nil, err
 	}
 
