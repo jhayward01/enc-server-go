@@ -1,4 +1,4 @@
-Updated Jan-2026
+_Updated Jan-2026_
 
 # enc-server-go #
 This project implements a web-based encryption application in Go. Two 
