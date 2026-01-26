@@ -1,3 +1,5 @@
+Updated Jan-2026
+
 # enc-server-go #
 This project implements a web-based encryption application in Go. Two 
 microservices are defined in this project - a _front-end_ and _back-end_ 
