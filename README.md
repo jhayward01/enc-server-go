@@ -8,7 +8,7 @@ service. Both contain client and server components.
 The front-end service defines three endpoints served by a Gin Framework RESTful API:
 
 * _StoreRecord_ - This endpoint accepts requests to store a record associated 
-with a user ID. The records are encrypted with a randomly-generated 32-bit 
+with a user ID. The records are encrypted with a randomly-generated 32-byte 
 key using AES in GCM mode. User IDs are encrypted similarly with a fixed 
 internal AES key (intended to provided user anonymity on the data store). 
 Encrypted user IDs and records are transmitted to the _back-end_ service, 
