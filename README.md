@@ -10,17 +10,17 @@ The front-end service defines three endpoints served by a Gin Framework RESTful 
 * _StoreRecord_ - This endpoint accepts requests to store a record associated 
 with a user ID. The records are encrypted with a randomly-generated 32-byte 
 key using AES in GCM mode. User IDs are encrypted similarly with a fixed 
-internal AES key (intended to provided user anonymity on the data store). 
+internal AES key (intended to provide user anonymity on the data store). 
 Encrypted user IDs and records are transmitted to the _back-end_ service, 
 and the record AES key is returned to the user.
 	
 * _RetrieveRecord_ - This endpoint accepts requests for record retrieval via 
 a user ID and AES key. The microservice requests the encrypted record from 
 the _back-end_ service, decrypts the record with the AES key, and returns 
-it to the user. 
+it to the user.
 
 * _DeleteRecord_ - This endpoint accepts requests for record deletion via a user ID. 
-	
+
 The back-end service defines three parallel endpoints for storing and 
 retrieving encrypted user data, served by a Golang GRPC API. This microservice 
 interacts with a MongoDB instance to provide persistent storage of data.
