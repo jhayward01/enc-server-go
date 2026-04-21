@@ -147,6 +147,10 @@ between microservices. The current v2 version uses Gin Framework RESTful API for
 the front-end service and Golang GRPC for the back-end service. Command line 
 parameter `--v1` can be used to test the original socket communication mode.
 
+## Security Notes ##
+For the purposes of this project, encryption and key generation are done locally
+using standard Golang libraries (`crypto/cipher`, `encoding/hex`). In a production environment, these features would be adapted to use a dedicated cloud-native key management service, like HashiCorp Vault or AWS KMS. This would help facilitate production-level security concerns, including centralized secret management, automatic key rotation, and audit logging.
+
 ## Further Work ##
 
 * ~~Refactor out remaining redundancies.~~
