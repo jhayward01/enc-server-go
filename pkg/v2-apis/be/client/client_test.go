@@ -125,7 +125,7 @@ func TestClient_StoreRecord(t *testing.T) {
 		id          []byte
 		data        []byte
 		mockServiceFn func(ctx context.Context, in *service.StoreRequest, opts ...grpc.CallOption) (*service.StoreResponse, error)
-		mockDialerFn  func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
+		mockDialerFn  func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
 		wantErr     bool
 		errContains string
 	}{
@@ -139,9 +139,9 @@ func TestClient_StoreRecord(t *testing.T) {
 				assert.Equal(t, hex.EncodeToString([]byte("test-data")), in.Data)
 				return &service.StoreResponse{}, nil
 			},
-			mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
 				ctx, cancel := context.WithCancel(context.Background())
-				return nil, &mockBackendServiceClient{}, ctx, cancel, nil
+				return nil, mockService, ctx, cancel, nil
 			},
 			wantErr: false,
 		},
@@ -149,26 +149,26 @@ func TestClient_StoreRecord(t *testing.T) {
 			name: "should fail on dialer error",
 			id:   []byte("test-id"),
 			data: []byte("test-data"),
-			mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
 				return nil, nil, nil, nil, errors.New("connection failed")
 			},
 			wantErr:     true,
 			errContains: "Error connecting to backend server",
 		},
-		// {
-		// 	name: "should fail on service error",
-		// 	id:   []byte("test-id"),
-		// 	data: []byte("test-data"),
-		// 	mockServiceFn: func(ctx context.Context, in *service.StoreRequest, opts ...grpc.CallOption) (*service.StoreResponse, error) {
-		// 		return nil, errors.New("service error")
-		// 	},
-		// 	mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
-		// 		ctx, cancel := context.WithCancel(context.Background())
-		// 		return nil, &mockBackendServiceClient{}, ctx, cancel, nil
-		// 	},
-		// 	wantErr:     true,
-		// 	errContains: "Could not send message",
-		// },
+		{
+			name: "should fail on service error",
+			id:   []byte("test-id"),
+			data: []byte("test-data"),
+			mockServiceFn: func(ctx context.Context, in *service.StoreRequest, opts ...grpc.CallOption) (*service.StoreResponse, error) {
+				return nil, errors.New("service error")
+			},
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+				ctx, cancel := context.WithCancel(context.Background())
+				return nil, mockService, ctx, cancel, nil
+			},
+			wantErr:     true,
+			errContains: "Could not send message",
+		},
 	}
 
 	for _, test := range tests {
@@ -180,12 +180,7 @@ func TestClient_StoreRecord(t *testing.T) {
 			mockDialerObj := &mockDialer{
 				dialFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
 					if test.mockDialerFn != nil {
-						conn, svc, ctx, cancel, err := test.mockDialerFn(serverAddr)
-						// If no error, return our mock service
-						if err == nil && svc == nil {
-							return conn, mockService, ctx, cancel, err
-						}
-						return conn, svc, ctx, cancel, err
+						return test.mockDialerFn(serverAddr, mockService)
 					}
 					ctx, cancel := context.WithCancel(context.Background())
 					return nil, mockService, ctx, cancel, nil
@@ -220,7 +215,7 @@ func TestClient_RetrieveRecord(t *testing.T) {
 		name        string
 		id          []byte
 		mockServiceFn func(ctx context.Context, in *service.RetrieveRequest, opts ...grpc.CallOption) (*service.RetrieveResponse, error)
-		mockDialerFn  func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
+		mockDialerFn  func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
 		wantData    []byte
 		wantErr     bool
 		errContains string
@@ -235,50 +230,50 @@ func TestClient_RetrieveRecord(t *testing.T) {
 					Data: hex.EncodeToString([]byte("test-data")),
 				}, nil
 			},
-			mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
 				ctx, cancel := context.WithCancel(context.Background())
-				return nil, &mockBackendServiceClient{}, ctx, cancel, nil
+				return nil, mockService, ctx, cancel, nil
 			},
 			wantData: []byte("test-data"),
 			wantErr:  false,
 		},
-		// {
-		// 	name: "should fail on dialer error",
-		// 	id:   []byte("test-id"),
-		// 	mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
-		// 		return nil, nil, nil, nil, errors.New("connection failed")
-		// 	},
-		// 	wantErr:     true,
-		// 	errContains: "Error connecting to backend server",
-		// },
-		// {
-		// 	name: "should fail on service error",
-		// 	id:   []byte("test-id"),
-		// 	mockServiceFn: func(ctx context.Context, in *service.RetrieveRequest, opts ...grpc.CallOption) (*service.RetrieveResponse, error) {
-		// 		return nil, errors.New("service error")
-		// 	},
-		// 	mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
-		// 		ctx, cancel := context.WithCancel(context.Background())
-		// 		return nil, &mockBackendServiceClient{}, ctx, cancel, nil
-		// 	},
-		// 	wantErr:     true,
-		// 	errContains: "Could not send message",
-		// },
-		// {
-		// 	name: "should fail on invalid hex response",
-		// 	id:   []byte("test-id"),
-		// 	mockServiceFn: func(ctx context.Context, in *service.RetrieveRequest, opts ...grpc.CallOption) (*service.RetrieveResponse, error) {
-		// 		return &service.RetrieveResponse{
-		// 			Data: "invalid-hex",
-		// 		}, nil
-		// 	},
-		// 	mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
-		// 		ctx, cancel := context.WithCancel(context.Background())
-		// 		return nil, &mockBackendServiceClient{}, ctx, cancel, nil
-		// 	},
-		// 	wantErr:     true,
-		// 	errContains: "encoding/hex",
-		// },
+		{
+			name: "should fail on dialer error",
+			id:   []byte("test-id"),
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+				return nil, nil, nil, nil, errors.New("connection failed")
+			},
+			wantErr:     true,
+			errContains: "Error connecting to backend server",
+		},
+		{
+			name: "should fail on service error",
+			id:   []byte("test-id"),
+			mockServiceFn: func(ctx context.Context, in *service.RetrieveRequest, opts ...grpc.CallOption) (*service.RetrieveResponse, error) {
+				return nil, errors.New("service error")
+			},
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+				ctx, cancel := context.WithCancel(context.Background())
+				return nil, mockService, ctx, cancel, nil
+			},
+			wantErr:     true,
+			errContains: "Could not send message",
+		},
+		{
+			name: "should fail on invalid hex response",
+			id:   []byte("test-id"),
+			mockServiceFn: func(ctx context.Context, in *service.RetrieveRequest, opts ...grpc.CallOption) (*service.RetrieveResponse, error) {
+				return &service.RetrieveResponse{
+					Data: "invalid-hex",
+				}, nil
+			},
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+				ctx, cancel := context.WithCancel(context.Background())
+				return nil, mockService, ctx, cancel, nil
+			},
+			wantErr:     true,
+			errContains: "encoding/hex",
+		},
 	}
 
 	for _, test := range tests {
@@ -289,11 +284,9 @@ func TestClient_RetrieveRecord(t *testing.T) {
 
 			mockDialerObj := &mockDialer{
 				dialFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
-					// If there's a custom dialer function, use it
 					if test.mockDialerFn != nil {
-						return test.mockDialerFn(serverAddr)
+						return test.mockDialerFn(serverAddr, mockService)
 					}
-					// Otherwise, return success with our mock service
 					ctx, cancel := context.WithCancel(context.Background())
 					return nil, mockService, ctx, cancel, nil
 				},
@@ -328,7 +321,7 @@ func TestClient_DeleteRecord(t *testing.T) {
 		name        string
 		id          []byte
 		mockServiceFn func(ctx context.Context, in *service.DeleteRequest, opts ...grpc.CallOption) (*service.DeleteResponse, error)
-		mockDialerFn  func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
+		mockDialerFn  func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
 		wantErr     bool
 		errContains string
 	}{
@@ -340,34 +333,34 @@ func TestClient_DeleteRecord(t *testing.T) {
 				assert.Equal(t, hex.EncodeToString([]byte("test-id")), in.Id)
 				return &service.DeleteResponse{}, nil
 			},
-			mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
 				ctx, cancel := context.WithCancel(context.Background())
-				return nil, &mockBackendServiceClient{}, ctx, cancel, nil
+				return nil, mockService, ctx, cancel, nil
 			},
 			wantErr: false,
 		},
 		{
 			name: "should fail on dialer error",
 			id:   []byte("test-id"),
-			mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
 				return nil, nil, nil, nil, errors.New("connection failed")
 			},
 			wantErr:     true,
 			errContains: "Error connecting to backend server",
 		},
-		// {
-		// 	name: "should fail on service error",
-		// 	id:   []byte("test-id"),
-		// 	mockServiceFn: func(ctx context.Context, in *service.DeleteRequest, opts ...grpc.CallOption) (*service.DeleteResponse, error) {
-		// 		return nil, errors.New("service error")
-		// 	},
-		// 	mockDialerFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
-		// 		ctx, cancel := context.WithCancel(context.Background())
-		// 		return nil, &mockBackendServiceClient{}, ctx, cancel, nil
-		// 	},
-		// 	wantErr:     true,
-		// 	errContains: "Could not send message",
-		// },
+		{
+			name: "should fail on service error",
+			id:   []byte("test-id"),
+			mockServiceFn: func(ctx context.Context, in *service.DeleteRequest, opts ...grpc.CallOption) (*service.DeleteResponse, error) {
+				return nil, errors.New("service error")
+			},
+			mockDialerFn: func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
+				ctx, cancel := context.WithCancel(context.Background())
+				return nil, mockService, ctx, cancel, nil
+			},
+			wantErr:     true,
+			errContains: "Could not send message",
+		},
 	}
 
 	for _, test := range tests {
@@ -379,12 +372,7 @@ func TestClient_DeleteRecord(t *testing.T) {
 			mockDialerObj := &mockDialer{
 				dialFn: func(serverAddr string) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error) {
 					if test.mockDialerFn != nil {
-						conn, svc, ctx, cancel, err := test.mockDialerFn(serverAddr)
-						// If no error, return our mock service
-						if err == nil && svc == nil {
-							return conn, mockService, ctx, cancel, err
-						}
-						return conn, svc, ctx, cancel, err
+						return test.mockDialerFn(serverAddr, mockService)
 					}
 					ctx, cancel := context.WithCancel(context.Background())
 					return nil, mockService, ctx, cancel, nil
