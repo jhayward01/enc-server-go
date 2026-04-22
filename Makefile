@@ -19,6 +19,11 @@ build:
 test::
 	go test -v ./...
 
+# make coverage            # Generate test coverage report for repo
+coverage: 
+	go test -v ./... -coverprofile=coverage.out
+	go tool cover -html=coverage.out -o coverage.html
+
 # make build-all           # Format, build, and test repo
 build-all: fmt proto build test
 	

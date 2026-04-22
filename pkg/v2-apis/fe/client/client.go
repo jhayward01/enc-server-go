@@ -22,6 +22,7 @@ type record struct {
 // Client implementation.
 type clientImpl struct {
 	serverAddr string
+	httpClient *http.Client
 }
 
 func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
@@ -38,14 +39,19 @@ func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 	}
 
 	// Compose request body
+	postURL := "http://" + c.serverAddr + "/records"
 	jsonData, err := json.Marshal(newRecord)
 	if err != nil {
 		return nil, errors.New("Error marshaling JSON: " + err.Error())
 	}
+	req, err := http.NewRequest("POST", postURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, errors.New("Error composing POST request: " + err.Error())
+	}
+	req.Header.Set("Content-Type", "application/json")
 
 	// Post request to FE server
-	postURL := "http://" + c.serverAddr + "/records"
-	resp, err := http.Post(postURL, "application/json", bytes.NewBuffer(jsonData))
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, errors.New("Error making POST request: " + err.Error())
 	}
@@ -82,9 +88,15 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 
 	log.Println("FE client received a get request for", idStr)
 
-	// Get request to FE server
+	// Compose request body
 	getURL := "http://" + c.serverAddr + "/records/" + idStr + "?key=" + keyStr
-	resp, err := http.Get(getURL)
+	req, err := http.NewRequest("GET", getURL, nil)
+	if err != nil {
+		return nil, errors.New("Error composing POST request: " + err.Error())
+	}
+
+	// Get request to FE server
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, errors.New("Error making GET request: " + err.Error())
 	}
@@ -118,7 +130,7 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 
 	log.Println("FE client received a delete request for", idStr)
 
-	// Delete request to FE server
+	// Compose request body
 	deleteURL := "http://" + c.serverAddr + "/records/" + idStr
 	req, err := http.NewRequest("DELETE", deleteURL, nil)
 	if err != nil {
@@ -126,8 +138,7 @@ func (c *clientImpl) DeleteRecord(id []byte) (err error) {
 	}
 
 	// Delete request to FE server
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return errors.New("Error making DELETE request: " + err.Error())
 	}
@@ -154,6 +165,7 @@ func MakeClient(configs map[string]string) (c utils.ClientFE, err error) {
 	// Build client implementation.
 	c = &clientImpl{
 		serverAddr: configs["serverAddr"],
+		httpClient: &http.Client{},
 	}
 
 	return c, nil
