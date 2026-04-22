@@ -1,18 +1,29 @@
+// client
 package client
 
 import (
+	"context"
 	"encoding/hex"
 	"errors"
 	"log"
+
+	"google.golang.org/grpc"
 
 	"enc-server-go/pkg/utils"
 	"enc-server-go/pkg/v2-apis/be/service"
 )
 
+// Dialer interface for dependency injection
+type Dialer interface {
+	Dial(serverAddr string) (conn *grpc.ClientConn, s service.BackendServiceClient,
+		ctx context.Context, cancel context.CancelFunc, err error)
+	Close(conn *grpc.ClientConn, cancel context.CancelFunc)
+}
+
 // Client implementation.
 type clientImpl struct {
 	serverAddr string
-	dialer     service.Dialer
+	dialer     Dialer
 }
 
 func (c *clientImpl) StoreRecord(id, data []byte) (err error) {
@@ -103,7 +114,7 @@ func MakeClient(configs map[string]string) (c utils.ClientBE, err error) {
 	// Build client implementation.
 	c = &clientImpl{
 		serverAddr: configs["serverAddr"],
-		dialer:     service.Dialer{},
+		dialer:     &service.RealDialer{},
 	}
 
 	return c, nil

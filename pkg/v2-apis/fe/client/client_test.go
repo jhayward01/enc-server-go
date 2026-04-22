@@ -225,45 +225,45 @@ func TestClient_RetrieveRecord(t *testing.T) {
 			wantData: []byte(hex.EncodeToString([]byte("test-data"))),
 			wantErr:  false,
 		},
-		// {
-		// 	name: "should fail when request returns non-200 status",
-		// 	id:   []byte("test-id"),
-		// 	key:  []byte("test-key"),
-		// 	mockFn: func(req *http.Request) (*http.Response, error) {
-		// 		return &http.Response{
-		// 			StatusCode: http.StatusNotFound,
-		// 			Body:       io.NopCloser(strings.NewReader("Not found")),
-		// 			Header:     make(http.Header),
-		// 			Status:     "404 Not Found",
-		// 		}, nil
-		// 	},
-		// 	wantErr:     true,
-		// 	errContains: "Bad status making GET request",
-		// },
-		// {
-		// 	name: "should fail on request error",
-		// 	id:   []byte("test-id"),
-		// 	key:  []byte("test-key"),
-		// 	mockFn: func(req *http.Request) (*http.Response, error) {
-		// 		return nil, errors.New("connection refused")
-		// 	},
-		// 	wantErr:     true,
-		// 	errContains: "Error making GET request",
-		// },
-		// {
-		// 	name: "should fail on invalid response JSON",
-		// 	id:   []byte("test-id"),
-		// 	key:  []byte("test-key"),
-		// 	mockFn: func(req *http.Request) (*http.Response, error) {
-		// 		return &http.Response{
-		// 			StatusCode: http.StatusOK,
-		// 			Body:       io.NopCloser(strings.NewReader("invalid json")),
-		// 			Header:     make(http.Header),
-		// 		}, nil
-		// 	},
-		// 	wantErr:     true,
-		// 	errContains: "Error unmarshalling record",
-		// },
+		{
+			name: "should fail when request returns non-200 status",
+			id:   []byte("test-id"),
+			key:  []byte("test-key"),
+			mockFn: func(req *http.Request) (*http.Response, error) {
+				return &http.Response{
+					StatusCode: http.StatusNotFound,
+					Body:       io.NopCloser(strings.NewReader("Not found")),
+					Header:     make(http.Header),
+					Status:     "404 Not Found",
+				}, nil
+			},
+			wantErr:     true,
+			errContains: "Bad status making GET request",
+		},
+		{
+			name: "should fail on request error",
+			id:   []byte("test-id"),
+			key:  []byte("test-key"),
+			mockFn: func(req *http.Request) (*http.Response, error) {
+				return nil, errors.New("connection refused")
+			},
+			wantErr:     true,
+			errContains: "Error making GET request",
+		},
+		{
+			name: "should fail on invalid response JSON",
+			id:   []byte("test-id"),
+			key:  []byte("test-key"),
+			mockFn: func(req *http.Request) (*http.Response, error) {
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(strings.NewReader("invalid json")),
+					Header:     make(http.Header),
+				}, nil
+			},
+			wantErr:     true,
+			errContains: "Error unmarshalling record",
+		},
 	}
 
 	for _, test := range tests {
@@ -281,6 +281,75 @@ func TestClient_RetrieveRecord(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, test.wantData, got)
+			}
+		})
+	}
+}
+
+// DeleteRecord() - Test Method
+func TestClient_DeleteRecord(t *testing.T) {
+	tests := []struct {
+		name        string
+		id          []byte
+		mockFn      func(req *http.Request) (*http.Response, error)
+		wantErr     bool
+		errContains string
+	}{
+		{
+			name: "should delete record successfully",
+			id:   []byte("test-id"),
+			mockFn: func(req *http.Request) (*http.Response, error) {
+				// Verify request details
+				assert.Equal(t, "DELETE", req.Method)
+				assert.True(t, strings.HasPrefix(req.URL.String(), "http://localhost:7777/records/"))
+
+				return &http.Response{
+					StatusCode: http.StatusAccepted,
+					Body:       io.NopCloser(strings.NewReader("")),
+					Header:     make(http.Header),
+				}, nil
+			},
+			wantErr: false,
+		},
+		{
+			name: "should fail when request returns non-202 status",
+			id:   []byte("test-id"),
+			mockFn: func(req *http.Request) (*http.Response, error) {
+				return &http.Response{
+					StatusCode: http.StatusInternalServerError,
+					Body:       io.NopCloser(strings.NewReader("Server error")),
+					Header:     make(http.Header),
+					Status:     "500 Internal Server Error",
+				}, nil
+			},
+			wantErr:     true,
+			errContains: "Bad status making DELETE request",
+		},
+		{
+			name: "should fail on request error",
+			id:   []byte("test-id"),
+			mockFn: func(req *http.Request) (*http.Response, error) {
+				return nil, errors.New("connection refused")
+			},
+			wantErr:     true,
+			errContains: "Error making DELETE request",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			client := &clientImpl{
+				serverAddr: serverAddr,
+				httpClient: createMockClient(test.mockFn),
+			}
+
+			err := client.DeleteRecord(test.id)
+
+			if test.wantErr {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), test.errContains)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}

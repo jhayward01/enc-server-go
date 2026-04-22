@@ -8,9 +8,17 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Dialer struct{}
+// Dialer interface for dependency injection
+type Dialer interface {
+	Dial(serverAddr string) (conn *grpc.ClientConn, s BackendServiceClient,
+		ctx context.Context, cancel context.CancelFunc, err error)
+	Close(conn *grpc.ClientConn, cancel context.CancelFunc)
+}
 
-func (d *Dialer) Dial(serverAddr string) (conn *grpc.ClientConn, s BackendServiceClient,
+// RealDialer implements the Dialer interface for production use
+type RealDialer struct{}
+
+func (d *RealDialer) Dial(serverAddr string) (conn *grpc.ClientConn, s BackendServiceClient,
 	ctx context.Context, cancel context.CancelFunc, err error) {
 
 	// GRPC connection
@@ -26,7 +34,7 @@ func (d *Dialer) Dial(serverAddr string) (conn *grpc.ClientConn, s BackendServic
 	return conn, s, ctx, cancel, nil
 }
 
-func (d *Dialer) Close(conn *grpc.ClientConn, cancel context.CancelFunc) {
+func (d *RealDialer) Close(conn *grpc.ClientConn, cancel context.CancelFunc) {
 	defer conn.Close()
 	defer cancel()
 }

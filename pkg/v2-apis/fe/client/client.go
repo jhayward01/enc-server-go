@@ -92,7 +92,7 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 	getURL := "http://" + c.serverAddr + "/records/" + idStr + "?key=" + keyStr
 	req, err := http.NewRequest("GET", getURL, nil)
 	if err != nil {
-		return nil, errors.New("Error composing POST request: " + err.Error())
+		return nil, errors.New("Error composing GET request: " + err.Error())
 	}
 
 	// Get request to FE server
