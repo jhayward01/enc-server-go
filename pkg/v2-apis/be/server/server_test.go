@@ -2,7 +2,9 @@ package server
 
 import (
 	"errors"
+	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/maps"
@@ -293,6 +295,91 @@ func TestServer_DeleteRecord(t *testing.T) {
 			got, err := s.DeleteRecord(nil, test.args.req)
 			assert.Equal(t, test.want, got)
 			assert.Equal(t, test.wantErr, err)
+		})
+	}
+}
+
+// Mock Listener for testing Start()
+type mockListener struct {
+	acceptFn func() (net.Conn, error)
+	closeFn  func() error
+	addrFn   func() net.Addr
+}
+
+func (ml *mockListener) Accept() (net.Conn, error) {
+	if ml.acceptFn != nil {
+		return ml.acceptFn()
+	}
+	return nil, errors.New("accept error")
+}
+
+func (ml *mockListener) Close() error {
+	if ml.closeFn != nil {
+		return ml.closeFn()
+	}
+	return nil
+}
+
+func (ml *mockListener) Addr() net.Addr {
+	if ml.addrFn != nil {
+		return ml.addrFn()
+	}
+	return nil
+}
+
+// Start() - Test Method
+func TestServer_Start(t *testing.T) {
+	tests := []struct {
+		name             string
+		serverAddr       string
+		wantErr          bool
+		errContains      string
+	}{
+		{
+			name:       "should fail with invalid address format",
+			serverAddr: "invalid::address",
+			wantErr:    true,
+			errContains: "Failed to listen",
+		},
+		{
+			name:       "should fail with invalid port",
+			serverAddr: ":invalid-port",
+			wantErr:    true,
+			errContains: "Failed to listen",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			server := &serverImpl{
+				db:         &MockDB{t, ""},
+				serverAddr: test.serverAddr,
+			}
+
+			// Start server in a goroutine with a timeout
+			done := make(chan error, 1)
+			go func() {
+				err := server.Start()
+				done <- err
+			}()
+
+			// Give it a moment to fail
+			select {
+			case err := <-done:
+				if test.wantErr {
+					assert.Error(t, err)
+					if test.errContains != "" {
+						assert.Contains(t, err.Error(), test.errContains)
+					}
+				} else {
+					assert.NoError(t, err)
+				}
+			case <-time.After(500 * time.Millisecond):
+				if test.wantErr {
+					t.Error("Expected error but server started successfully")
+				}
+				// For successful cases, server is running - that's expected
+			}
 		})
 	}
 }

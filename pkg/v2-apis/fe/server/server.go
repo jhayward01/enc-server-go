@@ -211,9 +211,7 @@ func (s *serverImpl) Start() (err error) {
 	router.DELETE("/records/:id", s.deleteRecord)
 
 	// Start router
-	router.Run(s.serverAddr)
-
-	return nil
+	return router.Run(s.serverAddr)
 }
 
 func MakeServer(configs map[string]string,

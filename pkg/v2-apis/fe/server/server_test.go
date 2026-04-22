@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -679,6 +680,86 @@ func TestServer_deleteRecord(t *testing.T) {
 			// If error, verify error message
 			if test.expectedStatus >= 400 && test.expectedErrorMsg != "" {
 				assert.Contains(t, w.Body.String(), test.expectedErrorMsg)
+			}
+		})
+	}
+}
+
+// Mock http.Server for testing Start()
+type mockGinEngine struct {
+	runFn func(addr ...string) error
+}
+
+func (m *mockGinEngine) Run(addr ...string) error {
+	if m.runFn != nil {
+		return m.runFn(addr...)
+	}
+	return nil
+}
+
+// Start() - Test Method
+func TestServer_Start(t *testing.T) {
+	tests := []struct {
+		name             string
+		serverAddr       string
+		mockGinFn        func() *gin.Engine
+		wantErr          bool
+		errContains      string
+	}{
+		{
+			name:       "should fail with invalid port format",
+			serverAddr: "999999",  // Port out of range
+			mockGinFn: func() *gin.Engine {
+				return gin.Default()
+			},
+			wantErr:     true,
+			errContains: "listen",  // Will contain listen error
+		},
+		{
+			name:       "should fail with invalid address",
+			serverAddr: "invalid::address",
+			mockGinFn: func() *gin.Engine {
+				engine := gin.Default()
+				// Mock the run to simulate an error
+				return engine
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			server := &serverImpl{
+				keygen:     keygen,
+				idNonce:    idNonce,
+				idCipher:   idCipher,
+				beClient:   &mockClientBE{},
+				serverAddr: test.serverAddr,
+			}
+
+			// Start server in a goroutine with a timeout
+			done := make(chan error, 1)
+			go func() {
+				err := server.Start()
+				done <- err
+			}()
+
+			// Give it a moment to fail or succeed
+			select {
+			case err := <-done:
+				if test.wantErr {
+					assert.Error(t, err)
+					if test.errContains != "" {
+						assert.Contains(t, err.Error(), test.errContains)
+					}
+				} else {
+					assert.NoError(t, err)
+				}
+			case <-time.After(500 * time.Millisecond):
+				if test.wantErr {
+					t.Error("Expected error but server started successfully")
+				}
+				// For successful cases, server is running - that's expected
 			}
 		})
 	}
