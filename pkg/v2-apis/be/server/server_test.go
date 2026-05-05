@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"net"
 	"testing"
@@ -190,7 +191,7 @@ func TestServer_StoreRecord(t *testing.T) {
 		}
 
 		t.Run(test.name, func(t *testing.T) {
-			got, err := s.StoreRecord(nil, test.args.req)
+			got, err := s.StoreRecord(context.TODO(), test.args.req)
 			assert.Equal(t, test.want, got)
 			assert.Equal(t, test.wantErr, err)
 		})
@@ -246,7 +247,7 @@ func TestServer_RetrieveRecord(t *testing.T) {
 		}
 
 		t.Run(test.name, func(t *testing.T) {
-			got, err := s.RetrieveRecord(nil, test.args.req)
+			got, err := s.RetrieveRecord(context.TODO(), test.args.req)
 			assert.Equal(t, test.want, got)
 			assert.Equal(t, test.wantErr, err)
 		})
@@ -300,7 +301,7 @@ func TestServer_DeleteRecord(t *testing.T) {
 		}
 
 		t.Run(test.name, func(t *testing.T) {
-			got, err := s.DeleteRecord(nil, test.args.req)
+			got, err := s.DeleteRecord(context.TODO(), test.args.req)
 			assert.Equal(t, test.want, got)
 			assert.Equal(t, test.wantErr, err)
 		})
