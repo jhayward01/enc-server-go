@@ -28,6 +28,7 @@ const keySizeStr = "32"
 const port = "7777"
 
 const serverAddr = "enc-server-go-be:8888"
+const serverRecordsPath = "/records"
 
 const badKeySizeStr = "fff"
 
@@ -41,6 +42,43 @@ const recordHexStr = "5041594c4f4144535041594c4f4144535041594c4f414453504159" +
 const recordHexEncStr = "396263343233393039616335b6d61c6839a0dda2524d19b4e5d" +
 	"ac5a1fda8902ad2701ced5c31c89088c3151d039ee27d003b75c3a140141c05da496572142eb" +
 	"5466c5edb07de33d8ac301f19789fbef68e5c3f280bf4f274e8d2d2d7"
+
+// Content types
+const contentTypeJSON = "application/json"
+const contentTypeHeader = "Content-Type"
+
+// HTTP methods
+const httpMethodPOST = "POST"
+const httpMethodGET = "GET"
+const httpMethodDELETE = "DELETE"
+
+// Query parameters
+const keyQueryParam = "key"
+const idQueryParam = "id"
+
+// Error Descriptions
+const badServerMessage = "MakeServer missing configuration keySize"
+const badClientMessage = "MakeClient missing configuration serverAddr"
+const badRandomKeyMessage = "KeyGen.RandomKey error"
+const badGetGCMCipherMessage = "KeyGen.GetGCMKey error"
+const badRandomNonceMessage = "KeyGen.RandomNonce error"
+const badBEClientMessage = "Back-end client error"
+const badDecryptMessage = "cipher: message authentication failed"
+const badRequest = "Malformed request"
+const badDecode = "encoding/hex: invalid byte: U+0069 'i'"
+
+// Test data strings
+const invalidHexID = "invalid-hex-gg"
+const corruptedData = "corrupted-data-that-wont-decrypt"
+
+// Error messages (for mocks)
+const errRandomKeyGenFailed = "random key generation failed"
+const errNonceGenFailed = "nonce generation failed"
+const errBackendStorageFailed = "backend storage failed"
+const errBackendRetrievalFailed = "backend retrieval failed"
+const errBackendDeletionFailed = "backend deletion failed"
+const errMockError = "mock error"
+
 
 // Test Variables
 var (
@@ -104,17 +142,6 @@ var (
 	}()
 )
 
-// Error Descriptions
-const badServerMessage = "MakeServer missing configuration keySize"
-const badClientMessage = "MakeClient missing configuration serverAddr"
-const badRandomKeyMessage = "KeyGen.RandomKey error"
-const badGetGCMCipherMessage = "KeyGen.GetGCMKey error"
-const badRandomNonceMessage = "KeyGen.RandomNonce error"
-const badBEClientMessage = "Back-end client error"
-const badDecryptMessage = "cipher: message authentication failed"
-const badRequest = "Malformed request"
-const badDecode = "encoding/hex: invalid byte: U+0069 'i'"
-
 // Mock KeyGen
 type mockKeyGen struct {
 	getGCMCipherFn func(key []byte) (cipher.AEAD, error)
@@ -126,21 +153,21 @@ func (m *mockKeyGen) GetGCMCipher(key []byte) (cipher.AEAD, error) {
 	if m.getGCMCipherFn != nil {
 		return m.getGCMCipherFn(key)
 	}
-	return nil, errors.New("mock error")
+	return nil, errors.New(errMockError)
 }
 
 func (m *mockKeyGen) RandomKey() ([]byte, error) {
 	if m.randomKeyFn != nil {
 		return m.randomKeyFn()
 	}
-	return nil, errors.New("mock error")
+	return nil, errors.New(errMockError)
 }
 
 func (m *mockKeyGen) RandomNonce(nonceSize int) ([]byte, error) {
 	if m.randomNonceFn != nil {
 		return m.randomNonceFn(nonceSize)
 	}
-	return nil, errors.New("mock error")
+	return nil, errors.New(errMockError)
 }
 
 // Mock ClientBE
@@ -161,7 +188,7 @@ func (m *mockClientBE) RetrieveRecord(id []byte) ([]byte, error) {
 	if m.retrieveRecordFn != nil {
 		return m.retrieveRecordFn(id)
 	}
-	return nil, errors.New("mock error")
+	return nil, errors.New(errMockError)
 }
 
 func (m *mockClientBE) DeleteRecord(id []byte) error {
@@ -262,7 +289,7 @@ func TestServer_postRecord(t *testing.T) {
 		{
 			name: "should fail with invalid hex ID",
 			requestBody: Record{
-				ID:   "invalid-hex-gg",
+				ID:   invalidHexID,
 				Data: recordHexStr,
 			},
 			mockKeyGenFn: func() (utils.KeyGen) {
@@ -278,7 +305,7 @@ func TestServer_postRecord(t *testing.T) {
 			name: "should fail with invalid hex data",
 			requestBody: Record{
 				ID:   idHexStr,
-				Data: "invalid-hex-gg",
+				Data: invalidHexID,
 			},
 			mockKeyGenFn: func() (utils.KeyGen) {
 				return keygen
@@ -301,7 +328,7 @@ func TestServer_postRecord(t *testing.T) {
 						return idCipher, nil
 					},
 					randomKeyFn: func() ([]byte, error) {
-						return nil, errors.New("random key generation failed")
+						return nil, errors.New(errRandomKeyGenFailed)
 					},
 				}
 			},
@@ -310,27 +337,6 @@ func TestServer_postRecord(t *testing.T) {
 			},
 			expectedStatus: http.StatusInternalServerError,
 		},
-		// {
-		// 	name: "should fail when GCM cipher creation fails",
-		// 	requestBody: Record{
-		// 		ID:   idHexStr,
-		// 		Data: recordHexStr,
-		// 	},
-		// 	mockKeyGenFn: func() (utils.KeyGen) {
-		// 		return &mockKeyGen{
-		// 			getGCMCipherFn: func(key []byte) (cipher.AEAD, error) {
-		// 				return nil, errors.New("invalid key size")
-		// 			},
-		// 			randomKeyFn: func() ([]byte, error) {
-		// 				return keygen.RandomKey()
-		// 			},
-		// 		}
-		// 	},
-		// 	mockClientBEFn: func() utils.ClientBE {
-		// 		return &mockClientBE{}
-		// 	},
-		// 	expectedStatus: http.StatusInternalServerError,
-		// },
 		{
 			name: "should fail when nonce generation fails",
 			requestBody: Record{
@@ -346,7 +352,7 @@ func TestServer_postRecord(t *testing.T) {
 						return keygen.RandomKey()
 					},
 					randomNonceFn: func(nonceSize int) ([]byte, error) {
-						return nil, errors.New("nonce generation failed")
+						return nil, errors.New(errNonceGenFailed)
 					},
 				}
 			},
@@ -367,7 +373,7 @@ func TestServer_postRecord(t *testing.T) {
 			mockClientBEFn: func() utils.ClientBE {
 				return &mockClientBE{
 					storeRecordFn: func(id, record []byte) error {
-						return errors.New("backend storage failed")
+						return errors.New(errBackendStorageFailed)
 					},
 				}
 			},
@@ -398,8 +404,8 @@ func TestServer_postRecord(t *testing.T) {
 
 			// Create request
 			body, _ := json.Marshal(test.requestBody)
-			req, _ := http.NewRequest("POST", "/records", bytes.NewReader(body))
-			req.Header.Set("Content-Type", "application/json")
+			req, _ := http.NewRequest(httpMethodPOST, serverRecordsPath, bytes.NewReader(body))
+			req.Header.Set(contentTypeHeader, contentTypeJSON)
 
 			// Create response recorder
 			w := httptest.NewRecorder()
@@ -476,7 +482,7 @@ func TestServer_getRecord(t *testing.T) {
 		},
 		{
 			name:           "should fail with invalid hex ID",
-			idParam:        "invalid-hex-gg",
+			idParam:        invalidHexID,
 			keyParam:       hex.EncodeToString(make([]byte, 32)),
 			mockKeyGenFn:   func() utils.KeyGen { return keygen },
 			mockClientBEFn: func(key []byte) utils.ClientBE { return &mockClientBE{} },
@@ -486,7 +492,7 @@ func TestServer_getRecord(t *testing.T) {
 		{
 			name:           "should fail with invalid hex key",
 			idParam:        idHexStr,
-			keyParam:       "invalid-hex-gg",
+			keyParam:       invalidHexID,
 			mockKeyGenFn:   func() utils.KeyGen { return keygen },
 			mockClientBEFn: func(key []byte) utils.ClientBE { return &mockClientBE{} },
 			expectedStatus: http.StatusBadRequest,
@@ -502,7 +508,7 @@ func TestServer_getRecord(t *testing.T) {
 			mockClientBEFn: func(key []byte) utils.ClientBE {
 				return &mockClientBE{
 					retrieveRecordFn: func(id []byte) ([]byte, error) {
-						return nil, errors.New("backend retrieval failed")
+						return nil, errors.New(errBackendRetrievalFailed)
 					},
 				}
 			},
@@ -518,8 +524,7 @@ func TestServer_getRecord(t *testing.T) {
 			mockClientBEFn: func(key []byte) utils.ClientBE {
 				return &mockClientBE{
 					retrieveRecordFn: func(id []byte) ([]byte, error) {
-						// Return corrupted data that won't decrypt
-						return []byte("corrupted-data-that-wont-decrypt"), nil
+						return []byte(corruptedData), nil
 					},
 				}
 			},
@@ -554,9 +559,9 @@ func TestServer_getRecord(t *testing.T) {
 			// Create request with path and query parameters
 			url := "/records/" + test.idParam
 			if test.keyParam != "" {
-				url += "?key=" + test.keyParam
+				url += "?" + keyQueryParam + "=" + test.keyParam
 			}
-			req, _ := http.NewRequest("GET", url, nil)
+			req, _ := http.NewRequest(httpMethodGET, url, nil)
 
 			// Create response recorder
 			w := httptest.NewRecorder()
@@ -565,7 +570,7 @@ func TestServer_getRecord(t *testing.T) {
 			ctx, _ := gin.CreateTestContext(w)
 			ctx.Request = req
 			ctx.Params = gin.Params{
-				{Key: "id", Value: test.idParam},
+				{Key: idQueryParam, Value: test.idParam},
 			}
 
 			// Call handler
@@ -622,7 +627,7 @@ func TestServer_deleteRecord(t *testing.T) {
 		},
 		{
 			name:           "should fail with invalid hex ID",
-			idParam:        "invalid-hex-gg",
+			idParam:        invalidHexID,
 			mockKeyGenFn:   func() utils.KeyGen { return keygen },
 			mockClientBEFn: func() utils.ClientBE { return &mockClientBE{} },
 			expectedStatus: http.StatusBadRequest,
@@ -637,7 +642,7 @@ func TestServer_deleteRecord(t *testing.T) {
 			mockClientBEFn: func() utils.ClientBE {
 				return &mockClientBE{
 					deleteRecordFn: func(id []byte) error {
-						return errors.New("backend deletion failed")
+						return errors.New(errBackendDeletionFailed)
 					},
 				}
 			},
@@ -659,7 +664,7 @@ func TestServer_deleteRecord(t *testing.T) {
 			}
 
 			// Create request
-			req, _ := http.NewRequest("DELETE", "/records/"+test.idParam, nil)
+			req, _ := http.NewRequest(httpMethodDELETE, "/records/"+test.idParam, nil)
 
 			// Create response recorder
 			w := httptest.NewRecorder()
@@ -668,7 +673,7 @@ func TestServer_deleteRecord(t *testing.T) {
 			ctx, _ := gin.CreateTestContext(w)
 			ctx.Request = req
 			ctx.Params = gin.Params{
-				{Key: "id", Value: test.idParam},
+				{Key: idQueryParam, Value: test.idParam},
 			}
 
 			// Call handler
