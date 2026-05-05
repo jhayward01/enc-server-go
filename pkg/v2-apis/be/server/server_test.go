@@ -32,6 +32,7 @@ const badRequest = "Malformed request"
 const badDBClientMessage = "Database client error"
 const badServer = "invalid::address"
 const badPort = ":invalid-port"
+const badSuccess = "Expected error but server started successfully"
 
 const failedToListenMessage = "Failed to listen"
 
@@ -321,7 +322,7 @@ func (ml *mockListener) Accept() (net.Conn, error) {
 	if ml.acceptFn != nil {
 		return ml.acceptFn()
 	}
-	return nil, errors.New("accept error")
+	return nil, errors.New("")
 }
 
 func (ml *mockListener) Close() error {
@@ -387,7 +388,7 @@ func TestServer_Start(t *testing.T) {
 				}
 			case <-time.After(500 * time.Millisecond):
 				if test.wantErr {
-					t.Error("Expected error but server started successfully")
+					t.Error(badSuccess)
 				}
 			}
 		})

@@ -345,7 +345,7 @@ func TestClient_DeleteRecord(t *testing.T) {
 					StatusCode: http.StatusInternalServerError,
 					Body:       io.NopCloser(strings.NewReader(errServerError)),
 					Header:     make(http.Header),
-					Status:     "500 Internal Server Error",
+					Status:     bad500Status,
 				}, nil
 			},
 			wantErr:     true,

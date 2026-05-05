@@ -557,7 +557,7 @@ func TestServer_getRecord(t *testing.T) {
 			}
 
 			// Create request with path and query parameters
-			url := "/records/" + test.idParam
+			url := serverRecordsPath + "/" + test.idParam
 			if test.keyParam != "" {
 				url += "?" + keyQueryParam + "=" + test.keyParam
 			}
