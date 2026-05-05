@@ -23,6 +23,20 @@ const recordHexEncStr = "396263343233393039616335b6d61c6839a0dda2524d19b4e5d" +
 	"ac5a1fda8902ad2701ced5c31c89088c3151d039ee27d003b75c3a140141c05da496572142eb" +
 	"5466c5edb07de33d8ac301f19789fbef68e5c3f280bf4f274e8d2d2d7"
 
+// Error Descriptions
+const badDBMessage = "MakeDB missing configuration mongoURI"
+const badPortMessage = "MakeServer missing configuration port"
+
+const badRequest = "Malformed request"
+const badDBClientMessage = "Database client error"
+
+const failedToListenMessage = "Failed to listen"
+
+// MockDB failure modes
+const mockDBFailStore = "Store"
+const mockDBFailRetrieve = "Retrieve"
+const mockDBFailDelete = "Delete"
+
 // Test Variables
 var (
 	goodDBConfig = map[string]string{
@@ -55,12 +69,6 @@ var (
 	}()
 )
 
-// Error Descriptions
-const badDBMessage = "MakeDB missing configuration mongoURI"
-const badPortMessage = "MakeServer missing configuration port"
-
-const badRequest = "Malformed request"
-const badDBClientMessage = "Database client error"
 
 // Mock DB Client
 type MockDB struct {
@@ -69,7 +77,7 @@ type MockDB struct {
 }
 
 func (db *MockDB) StoreRecord(id, record string) (err error) {
-	if db.fail == "Store" {
+	if db.fail == mockDBFailStore {
 		return errors.New(badDBClientMessage)
 	}
 	assert.Equal(db.t, idHexEncStr, id)
@@ -78,7 +86,7 @@ func (db *MockDB) StoreRecord(id, record string) (err error) {
 }
 
 func (db *MockDB) RetrieveRecord(id string) (record string, err error) {
-	if db.fail == "Retrieve" {
+	if db.fail == mockDBFailRetrieve {
 		return "", errors.New(badDBClientMessage)
 	}
 	assert.Equal(db.t, idHexEncStr, id)
@@ -86,7 +94,7 @@ func (db *MockDB) RetrieveRecord(id string) (record string, err error) {
 }
 
 func (db *MockDB) DeleteRecord(id string) (err error) {
-	if db.fail == "Delete" {
+	if db.fail == mockDBFailDelete {
 		return errors.New(badDBClientMessage)
 	}
 	assert.Equal(db.t, idHexEncStr, id)
@@ -164,7 +172,7 @@ func TestServer_StoreRecord(t *testing.T) {
 		}, {
 			name: "should fail on database client StoreRecord()",
 			fields: fields{
-				db: &MockDB{t, "Store"},
+				db: &MockDB{t, mockDBFailStore},
 			},
 			args: args{
 				req: &service.StoreRequest{
@@ -221,7 +229,7 @@ func TestServer_RetrieveRecord(t *testing.T) {
 		}, {
 			name: "should fail on database client RetrieveRecord()",
 			fields: fields{
-				db: &MockDB{t, "Retrieve"},
+				db: &MockDB{t, mockDBFailRetrieve},
 			},
 			args: args{
 				req: &service.RetrieveRequest{
@@ -275,7 +283,7 @@ func TestServer_DeleteRecord(t *testing.T) {
 		}, {
 			name: "should fail on database client DeleteRecord()",
 			fields: fields{
-				db: &MockDB{t, "Delete"},
+				db: &MockDB{t, mockDBFailDelete},
 			},
 			args: args{
 				req: &service.DeleteRequest{
@@ -339,13 +347,13 @@ func TestServer_Start(t *testing.T) {
 			name:       "should fail with invalid address format",
 			serverAddr: "invalid::address",
 			wantErr:    true,
-			errContains: "Failed to listen",
+			errContains: failedToListenMessage,
 		},
 		{
 			name:       "should fail with invalid port",
 			serverAddr: ":invalid-port",
 			wantErr:    true,
-			errContains: "Failed to listen",
+			errContains: failedToListenMessage,
 		},
 	}
 

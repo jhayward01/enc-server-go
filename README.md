@@ -88,6 +88,7 @@ make fmt                 # Run format and static analysis tools
 make proto               # Build GRPC protos
 make build               # Build repo
 make test                # Test repo
+make coverage            # Generate test coverage report for repo
 make build-all           # Format, build, and test repo
 make install-client-fe   # Install FE client
 make install-client-be   # Install BE client
