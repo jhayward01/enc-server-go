@@ -30,6 +30,8 @@ const badPortMessage = "MakeServer missing configuration port"
 
 const badRequest = "Malformed request"
 const badDBClientMessage = "Database client error"
+const badServer = "invalid::address"
+const badPort = ":invalid-port"
 
 const failedToListenMessage = "Failed to listen"
 
@@ -346,13 +348,13 @@ func TestServer_Start(t *testing.T) {
 	}{
 		{
 			name:       "should fail with invalid address format",
-			serverAddr: "invalid::address",
+			serverAddr: badServer,
 			wantErr:    true,
 			errContains: failedToListenMessage,
 		},
 		{
 			name:       "should fail with invalid port",
-			serverAddr: ":invalid-port",
+			serverAddr: badPort,
 			wantErr:    true,
 			errContains: failedToListenMessage,
 		},
@@ -387,7 +389,6 @@ func TestServer_Start(t *testing.T) {
 				if test.wantErr {
 					t.Error("Expected error but server started successfully")
 				}
-				// For successful cases, server is running - that's expected
 			}
 		})
 	}
