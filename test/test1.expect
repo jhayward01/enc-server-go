@@ -1,8 +1,9 @@
-Started feclient
-Running in v2 mode
-record PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS
-FE client received a store request for 4a5448
-FE client received a get request for 4a5448
-retrieved PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS
-FE client received a delete request for 4a5448
-deleted record
+"level":"INFO","msg":"Started feclient","service":"feclient"}
+"level":"INFO","msg":"Running in v2 mode","service":"feclient"}
+"level":"INFO","msg":"FE client MakeClient with configs: map[serverAddr:localhost:7777]","service":"feclient"}
+"level":"INFO","msg":"record PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS","service":"feclient"}
+"level":"INFO","msg":"FE client received a store request for 4a5448","service":"feclient"}
+"level":"INFO","msg":"FE client received a get request for 4a5448","service":"feclient"}
+"level":"INFO","msg":"retrieved PAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADSPAYLOADS","service":"feclient"}
+"level":"INFO","msg":"FE client received a delete request for 4a5448","service":"feclient"}
+"level":"INFO","msg":"deleted record","service":"feclient"}
