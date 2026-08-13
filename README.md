@@ -150,7 +150,24 @@ parameter `--v1` can be used to test the original socket communication mode if n
 
 ## Security Considerations ##
 For the purposes of this project, encryption and key generation are done locally
-using standard Golang libraries (`crypto/cipher`, `encoding/hex`). In a production environment, these features would be adapted to use a dedicated cloud-native key management service, like HashiCorp Vault or AWS KMS. This would help facilitate production-level security concerns, including centralized secret management, automatic key rotation, and audit logging.
+using standard Golang libraries (`crypto/cipher`, `encoding/hex`). In a production 
+environment, these features would be adapted to use a dedicated cloud-native key 
+management service, like HashiCorp Vault or AWS KMS. This would help facilitate 
+production-level security concerns, including centralized secret management, 
+automatic key rotation, and audit logging.
+
+### Deterministic Identifiers vs. Production Nonce Management ###
+* **Static Nonce Trade-off:** To simplify database lookup logic without adding 
+secondary index tables, User IDs are encrypted using a static initialization 
+vector (nonce). This creates deterministic ciphertext, allowing direct query 
+matching on MongoDB.
+
+* **Production Recommendation:** In cryptographic standards, reusing a static 
+nonce with AES-GCM across multiple encryptions degrades security guarantees. 
+In a production deployment, database searchability should be handled via a 
+dedicated HMAC blind index (a deterministic keyed hash), allowing every encrypted 
+field and payload to utilize a freshly generated, cryptographically random nonce 
+per operation.
 
 ## Further Work ##
 
