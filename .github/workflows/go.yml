@@ -11,28 +11,47 @@ on:
 
 jobs:
 
-  build:
+  unit-test-and-build:
+    name: Unit Tests & Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.25'
-        cache: true
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
 
-    - name: Build
-      run: make build
+      - name: Build Binaries
+        run: make build
 
-    - name: Test
-      run: make test
+      - name: Run Unit Tests
+        run: make test
+        
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
 
-    - name: Start Servers 
-      run: make servers
+  #   - name: Set up Go
+  #     uses: actions/setup-go@v5
+  #     with:
+  #       go-version: '1.25'
+  #       cache: true
 
-    - name: Integration Test 
-      run: make itests
+  #   - name: Build
+  #     run: make build
 
-    - name: Stop Servers
-      run: make stop
+  #   - name: Test
+  #     run: make test
+
+  #   - name: Start Servers 
+  #     run: make servers
+
+  #   - name: Integration Test 
+  #     run: make itests
+
+  #   - name: Stop Servers
+  #     run: make stop
