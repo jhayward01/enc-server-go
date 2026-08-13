@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Dialer interface for dependency injection
@@ -22,7 +23,7 @@ func (d *RealDialer) Dial(serverAddr string) (conn *grpc.ClientConn, s BackendSe
 	ctx context.Context, cancel context.CancelFunc, err error) {
 
 	// GRPC connection
-	conn, err = grpc.Dial(serverAddr, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err = grpc.NewClient(serverAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, nil, nil, nil, errors.New("Error connecting to backend server: " + err.Error())
 	}

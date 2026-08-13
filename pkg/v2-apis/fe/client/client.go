@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -58,7 +58,7 @@ func (c *clientImpl) StoreRecord(id, data []byte) (key []byte, err error) {
 	defer resp.Body.Close()
 
 	// Read response body
-	data, err = ioutil.ReadAll(resp.Body)
+	data, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("Error reading response: " + err.Error())
 	}
@@ -103,7 +103,7 @@ func (c *clientImpl) RetrieveRecord(id, key []byte) (data []byte, err error) {
 	defer resp.Body.Close()
 
 	// Read response body
-	data, err = ioutil.ReadAll(resp.Body)
+	data, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("Error reading response: " + err.Error())
 	}
