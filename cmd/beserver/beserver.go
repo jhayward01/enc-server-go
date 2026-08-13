@@ -21,7 +21,7 @@ func main() {
 	flag.Parse()
 
 	// Logging
-	logFile, err := utils.StartLog("beserver")
+	logFile, err := utils.InitLogger("beserver")
 	if err != nil {
 		log.Fatalf("Failed to start log: %v", err)
 	}

@@ -20,7 +20,7 @@ func main() {
 	flag.Parse()
 
 	// Logging
-	logFile, err := utils.StartLog("feclient")
+	logFile, err := utils.InitLogger("feclient")
 	if err != nil {
 		log.Fatalf("Failed to start log: %v", err)
 	}

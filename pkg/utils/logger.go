@@ -3,54 +3,66 @@ package utils
 import (
 	"io"
 	"io/fs"
-	"log"
+	"log/slog"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
 
 const defaultDir = "/tmp/enc-server-go-logs"
 
-func StartLog(name string) (logFile *os.File, err error) {
-
-	// Load log directory override.
+// InitLogger configures structured JSON logging via log/slog.
+// It returns the log file handle (to be closed by caller) or an error.
+func InitLogger(serviceName string) (*os.File, error) {
+	// 1. Determine log directory override.
 	logDir := defaultDir
 	if val, ok := os.LookupEnv("ENC_SERVER_GO_LOG_DIR"); ok {
 		logDir = val
 	}
 
-	// Create directory folder
-	if err = os.MkdirAll(logDir, os.ModePerm); err != nil {
+	// 2. Ensure log directory exists.
+	if err := os.MkdirAll(logDir, os.ModePerm); err != nil {
 		return nil, err
 	}
 
-	// Create log file.
-	timestamp := time.Now().UTC().Format(time.RFC3339)
-	logPath := logDir + "/" + name + "." + timestamp + ".log"
+	// 3. Create log file with RFC3339 timestamp.
+	timestamp := time.Now().UTC().Format("20060102-150405")
+	fileName := serviceName + "." + timestamp + ".log"
+	logPath := filepath.Join(logDir, fileName)
+
 	logFileFlags := os.O_CREATE | os.O_APPEND | os.O_RDWR
 	logFilePerm := fs.FileMode(0666)
-	if logFile, err = os.OpenFile(logPath, logFileFlags, logFilePerm); err != nil {
+	logFile, err := os.OpenFile(logPath, logFileFlags, logFilePerm)
+	if err != nil {
 		return nil, err
 	}
 
-	// Load standard out logging override.
+	// 4. Determine stdout logging behavior.
 	logStdOut := true
 	if val, ok := os.LookupEnv("ENC_SERVER_GO_LOG_STDOUT"); ok {
-		if logStdOut, err = strconv.ParseBool(val); err != nil {
-			return nil, err
+		if parsed, err := strconv.ParseBool(val); err == nil {
+			logStdOut = parsed
 		}
 	}
 
-	// Redirect logging to log file and standard output.
-	o := io.Writer(logFile)
+	// 5. Multi-writer target (file + optional stdout).
+	var writer io.Writer = logFile
 	if logStdOut {
-		o = io.MultiWriter(os.Stdout, logFile)
+		writer = io.MultiWriter(os.Stdout, logFile)
 	}
-	log.SetOutput(o)
 
-	// Misc. logger configuration
-	logFlags := log.Ldate | log.Ltime | log.LUTC
-	log.SetFlags(logFlags)
+	// 6. Build structured JSON handler with service metadata.
+	handlerOpts := &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}
+	jsonHandler := slog.NewJSONHandler(writer, handlerOpts)
+
+	// Create logger with pre-attached service attribute
+	logger := slog.New(jsonHandler).With(slog.String("service", serviceName))
+
+	// Set as global default logger
+	slog.SetDefault(logger)
 
 	return logFile, nil
 }
