@@ -48,7 +48,22 @@ jobs:
           make install-servers
           make install-client-fe
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          
+      
+      - name: Start Microservices
+        run: make servers
+
+      - name: Wait for Services Health
+        run: |
+          echo "Waiting for front-end service port 7777..."
+          timeout 30s bash -c 'until nc -z localhost 7777; do sleep 1; done'
+
+      - name: Run Integration Tests
+        run: make itests
+
+      - name: Stop Microservices
+        if: always()
+        run: make stop
+
   # build:
   #   runs-on: ubuntu-latest
   #   steps:
