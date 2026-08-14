@@ -50,7 +50,7 @@ var (
 
 // Mock BackendServiceClient
 type mockBackendServiceClient struct {
-	storeRecordFn   func(ctx context.Context, in *service.StoreRequest, opts ...grpc.CallOption) (*service.StoreResponse, error)
+	storeRecordFn    func(ctx context.Context, in *service.StoreRequest, opts ...grpc.CallOption) (*service.StoreResponse, error)
 	retrieveRecordFn func(ctx context.Context, in *service.RetrieveRequest, opts ...grpc.CallOption) (*service.RetrieveResponse, error)
 	deleteRecordFn   func(ctx context.Context, in *service.DeleteRequest, opts ...grpc.CallOption) (*service.DeleteResponse, error)
 }
@@ -134,13 +134,13 @@ func TestClient_MakeClient(t *testing.T) {
 // StoreRecord() - Test Method
 func TestClient_StoreRecord(t *testing.T) {
 	tests := []struct {
-		name        string
-		id          []byte
-		data        []byte
+		name          string
+		id            []byte
+		data          []byte
 		mockServiceFn func(ctx context.Context, in *service.StoreRequest, opts ...grpc.CallOption) (*service.StoreResponse, error)
 		mockDialerFn  func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
-		wantErr     bool
-		errContains string
+		wantErr       bool
+		errContains   string
 	}{
 		{
 			name: "should store record successfully",
@@ -225,13 +225,13 @@ func TestClient_StoreRecord(t *testing.T) {
 // RetrieveRecord() - Test Method
 func TestClient_RetrieveRecord(t *testing.T) {
 	tests := []struct {
-		name        string
-		id          []byte
+		name          string
+		id            []byte
 		mockServiceFn func(ctx context.Context, in *service.RetrieveRequest, opts ...grpc.CallOption) (*service.RetrieveResponse, error)
 		mockDialerFn  func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
-		wantData    []byte
-		wantErr     bool
-		errContains string
+		wantData      []byte
+		wantErr       bool
+		errContains   string
 	}{
 		{
 			name: "should retrieve record successfully",
@@ -331,12 +331,12 @@ func TestClient_RetrieveRecord(t *testing.T) {
 // DeleteRecord() - Test Method
 func TestClient_DeleteRecord(t *testing.T) {
 	tests := []struct {
-		name        string
-		id          []byte
+		name          string
+		id            []byte
 		mockServiceFn func(ctx context.Context, in *service.DeleteRequest, opts ...grpc.CallOption) (*service.DeleteResponse, error)
 		mockDialerFn  func(serverAddr string, mockService service.BackendServiceClient) (*grpc.ClientConn, service.BackendServiceClient, context.Context, context.CancelFunc, error)
-		wantErr     bool
-		errContains string
+		wantErr       bool
+		errContains   string
 	}{
 		{
 			name: "should delete record successfully",

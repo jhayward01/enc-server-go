@@ -73,7 +73,6 @@ var (
 	}()
 )
 
-
 // Mock DB Client
 type MockDB struct {
 	t    *testing.T
@@ -342,21 +341,21 @@ func (ml *mockListener) Addr() net.Addr {
 // Start() - Test Method
 func TestServer_Start(t *testing.T) {
 	tests := []struct {
-		name             string
-		serverAddr       string
-		wantErr          bool
-		errContains      string
+		name        string
+		serverAddr  string
+		wantErr     bool
+		errContains string
 	}{
 		{
-			name:       "should fail with invalid address format",
-			serverAddr: badServer,
-			wantErr:    true,
+			name:        "should fail with invalid address format",
+			serverAddr:  badServer,
+			wantErr:     true,
 			errContains: failedToListenMessage,
 		},
 		{
-			name:       "should fail with invalid port",
-			serverAddr: badPort,
-			wantErr:    true,
+			name:        "should fail with invalid port",
+			serverAddr:  badPort,
+			wantErr:     true,
 			errContains: failedToListenMessage,
 		},
 	}

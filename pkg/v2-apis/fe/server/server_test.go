@@ -79,7 +79,6 @@ const errBackendRetrievalFailed = "backend retrieval failed"
 const errBackendDeletionFailed = "backend deletion failed"
 const errMockError = "mock error"
 
-
 // Test Variables
 var (
 	id     = []byte(idStr)
@@ -256,13 +255,13 @@ func TestServer_MakeServer(t *testing.T) {
 // postRecord() - Test Method
 func TestServer_postRecord(t *testing.T) {
 	tests := []struct {
-		name              string
-		requestBody       Record
-		mockKeyGenFn      func() (utils.KeyGen)
-		mockClientBEFn    func() utils.ClientBE
-		expectedStatus    int
-		expectedHasKey    bool
-		expectedErrorMsg  string
+		name             string
+		requestBody      Record
+		mockKeyGenFn     func() utils.KeyGen
+		mockClientBEFn   func() utils.ClientBE
+		expectedStatus   int
+		expectedHasKey   bool
+		expectedErrorMsg string
 	}{
 		{
 			name: "should post record successfully",
@@ -270,7 +269,7 @@ func TestServer_postRecord(t *testing.T) {
 				ID:   idHexStr,
 				Data: recordHexStr,
 			},
-			mockKeyGenFn: func() (utils.KeyGen) {
+			mockKeyGenFn: func() utils.KeyGen {
 				return keygen
 			},
 			mockClientBEFn: func() utils.ClientBE {
@@ -292,7 +291,7 @@ func TestServer_postRecord(t *testing.T) {
 				ID:   invalidHexID,
 				Data: recordHexStr,
 			},
-			mockKeyGenFn: func() (utils.KeyGen) {
+			mockKeyGenFn: func() utils.KeyGen {
 				return keygen
 			},
 			mockClientBEFn: func() utils.ClientBE {
@@ -307,7 +306,7 @@ func TestServer_postRecord(t *testing.T) {
 				ID:   idHexStr,
 				Data: invalidHexID,
 			},
-			mockKeyGenFn: func() (utils.KeyGen) {
+			mockKeyGenFn: func() utils.KeyGen {
 				return keygen
 			},
 			mockClientBEFn: func() utils.ClientBE {
@@ -322,7 +321,7 @@ func TestServer_postRecord(t *testing.T) {
 				ID:   idHexStr,
 				Data: recordHexStr,
 			},
-			mockKeyGenFn: func() (utils.KeyGen) {
+			mockKeyGenFn: func() utils.KeyGen {
 				return &mockKeyGen{
 					getGCMCipherFn: func(key []byte) (cipher.AEAD, error) {
 						return idCipher, nil
@@ -343,7 +342,7 @@ func TestServer_postRecord(t *testing.T) {
 				ID:   idHexStr,
 				Data: recordHexStr,
 			},
-			mockKeyGenFn: func() (utils.KeyGen) {
+			mockKeyGenFn: func() utils.KeyGen {
 				return &mockKeyGen{
 					getGCMCipherFn: func(key []byte) (cipher.AEAD, error) {
 						return idCipher, nil
@@ -367,7 +366,7 @@ func TestServer_postRecord(t *testing.T) {
 				ID:   idHexStr,
 				Data: recordHexStr,
 			},
-			mockKeyGenFn: func() (utils.KeyGen) {
+			mockKeyGenFn: func() utils.KeyGen {
 				return keygen
 			},
 			mockClientBEFn: func() utils.ClientBE {
@@ -443,14 +442,14 @@ func TestServer_getRecord(t *testing.T) {
 		idParam          string
 		keyParam         string
 		mockKeyGenFn     func() utils.KeyGen
-		mockClientBEFn   func(key []byte) utils.ClientBE  // Pass key to mock
+		mockClientBEFn   func(key []byte) utils.ClientBE // Pass key to mock
 		expectedStatus   int
 		expectedErrorMsg string
 		validateData     func(data []byte, t *testing.T)
 	}{
 		{
-			name:    "should get record successfully",
-			idParam: idHexStr,
+			name:     "should get record successfully",
+			idParam:  idHexStr,
 			keyParam: hex.EncodeToString(make([]byte, 32)),
 			mockKeyGenFn: func() utils.KeyGen {
 				return keygen
@@ -481,26 +480,26 @@ func TestServer_getRecord(t *testing.T) {
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "should fail with invalid hex ID",
-			idParam:        invalidHexID,
-			keyParam:       hex.EncodeToString(make([]byte, 32)),
-			mockKeyGenFn:   func() utils.KeyGen { return keygen },
-			mockClientBEFn: func(key []byte) utils.ClientBE { return &mockClientBE{} },
-			expectedStatus: http.StatusBadRequest,
+			name:             "should fail with invalid hex ID",
+			idParam:          invalidHexID,
+			keyParam:         hex.EncodeToString(make([]byte, 32)),
+			mockKeyGenFn:     func() utils.KeyGen { return keygen },
+			mockClientBEFn:   func(key []byte) utils.ClientBE { return &mockClientBE{} },
+			expectedStatus:   http.StatusBadRequest,
 			expectedErrorMsg: badDecode,
 		},
 		{
-			name:           "should fail with invalid hex key",
-			idParam:        idHexStr,
-			keyParam:       invalidHexID,
-			mockKeyGenFn:   func() utils.KeyGen { return keygen },
-			mockClientBEFn: func(key []byte) utils.ClientBE { return &mockClientBE{} },
-			expectedStatus: http.StatusBadRequest,
+			name:             "should fail with invalid hex key",
+			idParam:          idHexStr,
+			keyParam:         invalidHexID,
+			mockKeyGenFn:     func() utils.KeyGen { return keygen },
+			mockClientBEFn:   func(key []byte) utils.ClientBE { return &mockClientBE{} },
+			expectedStatus:   http.StatusBadRequest,
 			expectedErrorMsg: badDecode,
 		},
 		{
-			name:    "should fail when backend client fails to retrieve record",
-			idParam: idHexStr,
+			name:     "should fail when backend client fails to retrieve record",
+			idParam:  idHexStr,
 			keyParam: hex.EncodeToString(make([]byte, 32)),
 			mockKeyGenFn: func() utils.KeyGen {
 				return keygen
@@ -515,8 +514,8 @@ func TestServer_getRecord(t *testing.T) {
 			expectedStatus: http.StatusInternalServerError,
 		},
 		{
-			name:    "should fail when decryption fails (corrupted data)",
-			idParam: idHexStr,
+			name:     "should fail when decryption fails (corrupted data)",
+			idParam:  idHexStr,
 			keyParam: hex.EncodeToString(make([]byte, 32)),
 			mockKeyGenFn: func() utils.KeyGen {
 				return keygen
@@ -552,7 +551,7 @@ func TestServer_getRecord(t *testing.T) {
 				keygen:     kg,
 				idNonce:    idNonce,
 				idCipher:   idCipherTest,
-				beClient:   test.mockClientBEFn(keyBytes),  // Pass key to mock
+				beClient:   test.mockClientBEFn(keyBytes), // Pass key to mock
 				serverAddr: ":" + port,
 			}
 
@@ -626,11 +625,11 @@ func TestServer_deleteRecord(t *testing.T) {
 			expectedStatus: http.StatusAccepted,
 		},
 		{
-			name:           "should fail with invalid hex ID",
-			idParam:        invalidHexID,
-			mockKeyGenFn:   func() utils.KeyGen { return keygen },
-			mockClientBEFn: func() utils.ClientBE { return &mockClientBE{} },
-			expectedStatus: http.StatusBadRequest,
+			name:             "should fail with invalid hex ID",
+			idParam:          invalidHexID,
+			mockKeyGenFn:     func() utils.KeyGen { return keygen },
+			mockClientBEFn:   func() utils.ClientBE { return &mockClientBE{} },
+			expectedStatus:   http.StatusBadRequest,
 			expectedErrorMsg: badDecode,
 		},
 		{
@@ -705,20 +704,20 @@ func (m *mockGinEngine) Run(addr ...string) error {
 // Start() - Test Method
 func TestServer_Start(t *testing.T) {
 	tests := []struct {
-		name             string
-		serverAddr       string
-		mockGinFn        func() *gin.Engine
-		wantErr          bool
-		errContains      string
+		name        string
+		serverAddr  string
+		mockGinFn   func() *gin.Engine
+		wantErr     bool
+		errContains string
 	}{
 		{
 			name:       "should fail with invalid port format",
-			serverAddr: "999999",  // Port out of range
+			serverAddr: "999999", // Port out of range
 			mockGinFn: func() *gin.Engine {
 				return gin.Default()
 			},
 			wantErr:     true,
-			errContains: "listen",  // Will contain listen error
+			errContains: "listen", // Will contain listen error
 		},
 		{
 			name:       "should fail with invalid address",

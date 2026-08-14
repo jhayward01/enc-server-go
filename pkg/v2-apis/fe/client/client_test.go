@@ -212,7 +212,6 @@ func TestClient_StoreRecord(t *testing.T) {
 	}
 }
 
-
 // RetrieveRecord() - Test Method
 func TestClient_RetrieveRecord(t *testing.T) {
 	tests := []struct {
